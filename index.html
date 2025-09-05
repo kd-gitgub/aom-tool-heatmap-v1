@@ -56,7 +56,7 @@
 
         .spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #8F29FC;
+            border-top: 4px solid #0079FF;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -118,20 +118,20 @@
         }
 
         .region-checkbox:hover {
-            border-color: #8F29FC;
-            background: #f8f9ff;
+            border-color: #0079FF;
+            background: #f0f7ff;
         }
 
         .region-checkbox input[type="checkbox"] {
             width: 16px;
             height: 16px;
-            accent-color: #8F29FC;
+            accent-color: #0079FF;
             cursor: pointer;
         }
 
         .region-checkbox.selected {
-            border-color: #8F29FC;
-            background: linear-gradient(135deg, #8F29FC, #7A1FE8);
+            border-color: #0079FF;
+            background: #0079FF;
             color: white;
         }
 
@@ -142,13 +142,18 @@
 
         .filter-btn {
             padding: 6px 12px;
-            border: 1px solid #8F29FC;
+            border: 1px solid #0079FF;
             background: white;
-            color: #8F29FC;
+            color: #0079FF;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9em;
             transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: #0079FF;
+            color: white;
         }
 
         .header {
@@ -211,8 +216,12 @@
             align-items: center;
             gap: 6px;
             font-weight: 600;
-            color: #495057;
+            color: #001c66;
             font-size: 0.9em;
+        }
+
+        .legend-item span {
+            color: #001c66;
         }
 
         .legend-color {
@@ -322,7 +331,7 @@
         }
 
         .header-cell:hover {
-            background: #8f29fc;
+            background: #0079FF;
         }
 
         .header-cell.corner-cell:hover {
@@ -570,21 +579,21 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: linear-gradient(135deg, #8F29FC, #7A1FE8);
+            background: #0079FF;
             color: white;
             border: none;
             border-radius: 50%;
             width: 60px;
             height: 60px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(143, 41, 252, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 121, 255, 0.3);
             transition: all 0.3s ease;
             font-size: 24px;
         }
 
         .refresh-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(143, 41, 252, 0.5);
+            box-shadow: 0 6px 20px rgba(0, 121, 255, 0.5);
         }
 
         @keyframes fadeIn {
