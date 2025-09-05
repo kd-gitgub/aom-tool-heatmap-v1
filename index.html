@@ -645,24 +645,24 @@
                     <input type="checkbox" id="americas-da" value="AMERICAS D&A" checked>
                     <span>AMERICAS D&A</span>
                 </label>
-                <label class="region-checkbox" id="ameta-da-label">
-                    <input type="checkbox" id="ameta-da" value="AMETA D&A">
+                <label class="region-checkbox selected" id="ameta-da-label">
+                    <input type="checkbox" id="ameta-da" value="AMETA D&A" checked>
                     <span>AMETA D&A</span>
                 </label>
-                <label class="region-checkbox" id="digital-da-label">
-                    <input type="checkbox" id="digital-da" value="DIGITAL D&A">
+                <label class="region-checkbox selected" id="digital-da-label">
+                    <input type="checkbox" id="digital-da" value="DIGITAL D&A" checked>
                     <span>DIGITAL D&A</span>
                 </label>
-                <label class="region-checkbox" id="europe-da-label">
-                    <input type="checkbox" id="europe-da" value="EUROPE D&A">
+                <label class="region-checkbox selected" id="europe-da-label">
+                    <input type="checkbox" id="europe-da" value="EUROPE D&A" checked>
                     <span>EUROPE D&A</span>
                 </label>
-                <label class="region-checkbox" id="era-label">
-                    <input type="checkbox" id="era" value="ERA">
+                <label class="region-checkbox selected" id="era-label">
+                    <input type="checkbox" id="era" value="ERA" checked>
                     <span>ERA</span>
                 </label>
-                <label class="region-checkbox" id="gac-label">
-                    <input type="checkbox" id="gac" value="GAC">
+                <label class="region-checkbox selected" id="gac-label">
+                    <input type="checkbox" id="gac" value="GAC" checked>
                     <span>GAC</span>
                 </label>
                 <div class="filter-actions">
@@ -756,7 +756,7 @@
         let toolsData = null;
         let subcapabilitiesData = {};
         let capabilities = [];
-        let selectedRegions = ['AMERICAS D&A'];
+        let selectedRegions = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
         let regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
 
         // Load data from GitHub on page load
