@@ -31,89 +31,53 @@
             overflow: auto;
         }
 
-        /* File upload section styles */
-        .file-upload-section {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 8px;
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #8F29FC;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
             padding: 15px;
+            border-radius: 8px;
             margin: 15px 0;
-            border: 2px solid #dadce0;
-        }
-
-        .file-upload-container {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .file-upload-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .file-label {
-            font-size: 0.9em;
-            color: #495057;
-            font-weight: 600;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .file-input {
             display: none;
         }
 
-        .file-button {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-block;
-        }
-
-        .file-button:hover {
-            background: linear-gradient(135deg, #5a6fd8, #6a42a0);
-        }
-
-        .file-status {
-            margin-left: 10px;
-            font-size: 0.85em;
-            color: #28a745;
-        }
-
-        .load-data-btn {
-            padding: 10px 24px;
-            background: linear-gradient(135deg, #8F29FC, #7A1FE8);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 700;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .load-data-btn:hover {
-            background: linear-gradient(135deg, #7A1FE8, #6515D3);
-        }
-
-        .load-data-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
+        .error-message.show {
+            display: block;
         }
 
         .region-filter {
@@ -262,7 +226,6 @@
         .tertiary { background: #D3CAD9; }
         .none { background: linear-gradient(135deg, #f8f9fa, #e9ecef); }
         
-        /* TIME Status Legend Colors */
         .time-invest { background: #28a745; }
         .time-tolerate { background: #ffc107; }
         .time-migrate { background: #fd7e14; }
@@ -404,7 +367,6 @@
             border-right: 3px solid #667eea;
         }
 
-        /* TIME Status Cell Colors */
         .time-status-invest {
             background: #28a745;
             color: white;
@@ -486,7 +448,6 @@
             font-size: 0.9em;
         }
 
-        /* Modal Styles */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -601,6 +562,27 @@
             font-size: 0.95em;
         }
 
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8F29FC, #7A1FE8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(143, 41, 252, 0.3);
+            transition: all 0.3s ease;
+            font-size: 24px;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(143, 41, 252, 0.5);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -641,11 +623,21 @@
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Loading data from GitHub...</h3>
+            <p>Please wait while we fetch the latest CSV files</p>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>Analytics Tools: Rationalisation Potential</h1>
             <p>Scenario #1: Databricks as a default foundational tool across all D&A teams</p>
         </div>
+
+        <div class="error-message" id="error-message"></div>
 
         <div class="region-filter">
             <div class="filter-controls">
@@ -727,31 +719,9 @@
         <div class="scroll-hint">
             ← Scroll horizontally to view all capabilities →
         </div>
-
-        <!-- File upload section (at the bottom) -->
-        <div class="file-upload-section">
-            <h3 style="color: #0A142D; margin-bottom: 10px; font-size: 1.1em;">Load Data Files</h3>
-            <div class="file-upload-container">
-                <div class="file-upload-group">
-                    <label class="file-label">AOM Tool Heatmap csv:</label>
-                    <div class="file-input-wrapper">
-                        <label for="tools-csv" class="file-button">Choose File</label>
-                        <input type="file" id="tools-csv" class="file-input" accept=".csv">
-                        <span class="file-status" id="tools-status"></span>
-                    </div>
-                </div>
-                <div class="file-upload-group">
-                    <label class="file-label">AOM Business Capabilities csv:</label>
-                    <div class="file-input-wrapper">
-                        <label for="subcapabilities-csv" class="file-button">Choose File</label>
-                        <input type="file" id="subcapabilities-csv" class="file-input" accept=".csv">
-                        <span class="file-status" id="subcapabilities-status"></span>
-                    </div>
-                </div>
-            </div>
-            <button class="load-data-btn" id="load-data" disabled>Load Heatmap</button>
-        </div>
     </div>
+
+    <button class="refresh-btn" id="refresh-btn" title="Refresh data from GitHub">↻</button>
 
     <!-- Modal -->
     <div class="modal-overlay" id="capabilityModal">
@@ -770,64 +740,70 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
+        // ============================================
+        // CONFIGURATION - YOUR GITHUB CSV URLS
+        // ============================================
+        const GITHUB_CSV_URLS = {
+            tools: 'https://raw.githubusercontent.com/kd-gitgub/aom-tool-heatmap-v1/main/tools-data.csv',
+            subcapabilities: 'https://raw.githubusercontent.com/kd-gitgub/aom-tool-heatmap-v1/main/subcapabilities-data.csv'
+        };
+
+        // ============================================
+        // END CONFIGURATION
+        // ============================================
+
         // Global variables for storing data
         let toolsData = null;
         let subcapabilitiesData = {};
         let capabilities = [];
         let selectedRegions = ['AMERICAS D&A'];
-        let regionColumns = [];
+        let regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
 
-        // File handling
-        document.getElementById('tools-csv').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('tools-status').textContent = '✔ ' + file.name;
-                checkIfReadyToLoad();
-            }
-        });
-
-        document.getElementById('subcapabilities-csv').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('subcapabilities-status').textContent = '✔ ' + file.name;
-                checkIfReadyToLoad();
-            }
-        });
-
-        function checkIfReadyToLoad() {
-            const toolsFile = document.getElementById('tools-csv').files[0];
-            const subcapFile = document.getElementById('subcapabilities-csv').files[0];
+        // Load data from GitHub on page load
+        async function loadDataFromGitHub() {
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('error-message');
             
-            if (toolsFile && subcapFile) {
-                document.getElementById('load-data').disabled = false;
-            }
-        }
+            loading.style.display = 'flex';
+            errorDiv.classList.remove('show');
 
-        document.getElementById('load-data').addEventListener('click', loadData);
+            try {
+                // Fetch both CSV files from GitHub
+                const [toolsResponse, subcapResponse] = await Promise.all([
+                    fetch(GITHUB_CSV_URLS.tools),
+                    fetch(GITHUB_CSV_URLS.subcapabilities)
+                ]);
 
-        function loadData() {
-            const toolsFile = document.getElementById('tools-csv').files[0];
-            const subcapFile = document.getElementById('subcapabilities-csv').files[0];
+                if (!toolsResponse.ok || !subcapResponse.ok) {
+                    throw new Error('Failed to fetch CSV files from GitHub');
+                }
 
-            Promise.all([
-                readCSVFile(toolsFile),
-                readCSVFile(subcapFile)
-            ]).then(([toolsContent, subcapContent]) => {
+                const toolsContent = await toolsResponse.text();
+                const subcapContent = await subcapResponse.text();
+
+                // Process the data
                 processToolsData(toolsContent);
                 processSubcapabilitiesData(subcapContent);
+                
+                // Initialize the heatmap
                 initializeHeatmap();
-            }).catch(error => {
-                alert('Error loading files: ' + error.message);
-            });
-        }
-
-        function readCSVFile(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.onerror = reject;
-                reader.readAsText(file);
-            });
+                
+                loading.style.display = 'none';
+            } catch (error) {
+                console.error('Error loading data:', error);
+                loading.style.display = 'none';
+                
+                errorDiv.innerHTML = `
+                    <strong>Error loading data:</strong> ${error.message}<br>
+                    Please check that the CSV files exist at the configured GitHub URLs.<br>
+                    <small>Tools URL: ${GITHUB_CSV_URLS.tools}<br>
+                    Subcapabilities URL: ${GITHUB_CSV_URLS.subcapabilities}</small>
+                `;
+                errorDiv.classList.add('show');
+                
+                // Show empty heatmap
+                updateHeatmap();
+            }
         }
 
         function processToolsData(csvContent) {
@@ -851,7 +827,7 @@
                     return numA - numB;
                 });
 
-            // Extract capabilities and region columns - INCLUDING Digital D&A
+            // Extract capabilities and region columns
             capabilities = capColumns.map(col => capabilityNamesRow[col] || `Capability ${col.replace('Cap', '')}`);
             regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
 
@@ -872,9 +848,8 @@
             // Track counts per capability to auto-fix duplicate IDs
             const capabilityCounts = {};
 
-            // Process each row - FIXED TO MATCH YOUR CSV COLUMN NAMES
+            // Process each row
             parsed.data.forEach(row => {
-                // Use the actual column names from your CSV (with underscores)
                 const capId = parseInt(
                     row.Capability_ID || 
                     row['Capability ID'] || 
@@ -898,12 +873,9 @@
                     row.description || 
                     row.desc;
 
-                // Handle cases where description might be split across columns due to commas
                 let fullDesc = desc || '';
                 
-                // Only concatenate if we have a valid description start
                 if (desc && (row[''] || row['_1'] || row['_2'])) {
-                    // Concatenate split description parts with commas restored
                     const parts = [desc];
                     if (row['']) parts.push(row['']);
                     if (row['_1']) parts.push(row['_1']);  
@@ -911,25 +883,19 @@
                     fullDesc = parts.filter(Boolean).join(', ');
                 }
 
-                // Only add if we have all required fields
                 if (capId && subId && fullDesc) {
                     if (!subcapabilitiesData[capId]) {
                         subcapabilitiesData[capId] = [];
                         capabilityCounts[capId] = 0;
                     }
                     
-                    // Auto-fix duplicate IDs caused by spreadsheet formatting issues
-                    // If we already have 9 items and this would be the 10th, fix the ID
                     capabilityCounts[capId]++;
                     if (capabilityCounts[capId] === 10 && subId === `${capId}.1`) {
                         subId = `${capId}.10`;
                     }
                     
-                    // Check if this ID already exists (duplicate)
                     const existingIndex = subcapabilitiesData[capId].findIndex(item => item.id === subId);
                     if (existingIndex !== -1) {
-                        // This is a duplicate ID, likely the 10th item
-                        // Assume it should be .10 instead of .1
                         subId = `${capId}.10`;
                     }
                     
@@ -939,17 +905,6 @@
                     });
                 }
             });
-
-            // Debug: Log what was loaded
-            console.log('Subcapabilities loaded:', Object.keys(subcapabilitiesData).length, 'capabilities');
-            console.log('Capability IDs found:', Object.keys(subcapabilitiesData).sort((a, b) => a - b));
-            
-            // Log sample data for debugging - check if all 10 are loaded
-            const sampleCapId = Object.keys(subcapabilitiesData)[0];
-            if (sampleCapId) {
-                console.log(`Capability ${sampleCapId} has ${subcapabilitiesData[sampleCapId].length} subcapabilities`);
-                console.log('IDs found:', subcapabilitiesData[sampleCapId].map(s => s.id));
-            }
         }
 
         function initializeHeatmap() {
@@ -964,9 +919,9 @@
             const heatmap = document.getElementById('heatmap');
             heatmap.innerHTML = '';
 
-            if (!toolsData) {
+            if (!toolsData || toolsData.length === 0) {
                 heatmap.className = 'heatmap empty';
-                heatmap.innerHTML = '<div style="text-align: center; padding: 40px;">Please load data files first</div>';
+                heatmap.innerHTML = '<div style="text-align: center; padding: 40px;">Loading data from GitHub...</div>';
                 return;
             }
 
@@ -979,7 +934,6 @@
                 heatmap.className = 'heatmap empty';
                 heatmap.innerHTML = '<div style="text-align: center; padding: 40px;">Select regions to view data</div>';
                 
-                // Update all stats to show 0 when no regions are selected
                 document.getElementById('tools-count').textContent = '0';
                 document.getElementById('capabilities-count').textContent = capabilities.length;
                 document.getElementById('high-potential-count').textContent = '0';
@@ -989,7 +943,7 @@
 
             heatmap.className = 'heatmap';
 
-            // Update grid template columns based on capability count - NOW WITH TIME STATUS COLUMN
+            // Update grid template columns
             heatmap.style.gridTemplateColumns = `320px 100px repeat(${capabilities.length}, minmax(100px, 1fr))`;
             heatmap.style.minWidth = `${320 + 100 + (capabilities.length * 100)}px`;
 
@@ -1034,7 +988,6 @@
                 timeStatusCell.className = 'time-status-cell';
                 const timeStatus = toolRow['TIME Status'] || '';
                 
-                // Apply appropriate styling based on TIME status
                 switch(timeStatus.toLowerCase()) {
                     case 'invest':
                         timeStatusCell.classList.add('time-status-invest');
@@ -1098,7 +1051,6 @@
             document.getElementById('tools-count').textContent = filteredTools.length;
             document.getElementById('capabilities-count').textContent = capabilities.length;
             
-            // Calculate high potential tools (tools with 3+ primary capabilities)
             const highPotentialCount = filteredTools.filter(row => {
                 let highScores = 0;
                 for (let i = 1; i <= capabilities.length; i++) {
@@ -1110,7 +1062,6 @@
             
             document.getElementById('high-potential-count').textContent = highPotentialCount;
             
-            // Calculate potential tool reduction percentage
             const totalTools = filteredTools.length;
             if (totalTools > 0) {
                 const reductionPercentage = Math.round((highPotentialCount / totalTools) * 100);
@@ -1137,6 +1088,11 @@
                 selectedRegions = [];
                 updateRegionCheckboxes();
                 updateHeatmap();
+            });
+
+            // Refresh button
+            document.getElementById('refresh-btn').addEventListener('click', () => {
+                loadDataFromGitHub();
             });
 
             // Modal event listeners
@@ -1191,18 +1147,14 @@
             
             const subcapabilities = subcapabilitiesData[capabilityIndex] || [];
             
-            // Sort subcapabilities properly by their ID (treating as version numbers, not decimals)
             const sortedSubcapabilities = subcapabilities.sort((a, b) => {
-                // Split IDs into parts (e.g., "1.10" becomes ["1", "10"])
                 const aParts = String(a.id).split('.').map(num => parseInt(num));
                 const bParts = String(b.id).split('.').map(num => parseInt(num));
                 
-                // Compare the main number first
                 if (aParts[0] !== bParts[0]) {
                     return aParts[0] - bParts[0];
                 }
                 
-                // If main numbers are equal, compare the sub-number
                 const aSubNum = aParts[1] || 0;
                 const bSubNum = bParts[1] || 0;
                 return aSubNum - bSubNum;
@@ -1237,7 +1189,6 @@
             modalTitle.textContent = toolData.Tool;
             modalContent.innerHTML = '';
             
-            // Include TIME Status in the tool modal
             const timeStatus = toolData['TIME Status'] || 'Not Set';
             let timeStatusColor = '#6c757d';
             let timeStatusBg = '#f8f9fa';
@@ -1317,9 +1268,9 @@
             document.body.style.overflow = '';
         }
 
-        // Initialize on page load
+        // Load data when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            updateHeatmap(); // Show empty state initially
+            loadDataFromGitHub();
         });
     </script>
 </body>
