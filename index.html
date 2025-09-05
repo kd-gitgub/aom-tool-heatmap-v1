@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #262f45;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 0;
             margin: 0;
@@ -118,20 +118,20 @@
         }
 
         .region-checkbox:hover {
-            border-color: #001c66;
+            border-color: #8F29FC;
             background: #f8f9ff;
         }
 
         .region-checkbox input[type="checkbox"] {
             width: 16px;
             height: 16px;
-            accent-color: #001c66;
+            accent-color: #8F29FC;
             cursor: pointer;
         }
 
         .region-checkbox.selected {
-            border-color: #001c66;
-            background: #001c66;
+            border-color: #8F29FC;
+            background: linear-gradient(135deg, #8F29FC, #7A1FE8);
             color: white;
         }
 
@@ -142,9 +142,9 @@
 
         .filter-btn {
             padding: 6px 12px;
-            border: 1px solid #001c66;
+            border: 1px solid #8F29FC;
             background: white;
-            color: #001c66;
+            color: #8F29FC;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9em;
@@ -177,11 +177,12 @@
         }
 
         .stat-card {
-            background: #8f29fc;
+            background: #0079ff;
             color: white;
             padding: 15px;
             border-radius: 8px;
             text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 121, 255, 0.3);
         }
 
         .stat-number {
@@ -260,6 +261,312 @@
             color: #666;
         }
 
+        .header-cell, .tool-cell, .time-header-cell, .time-status-cell {
+            padding: 8px 6px;
+            border: 1px solid #e1e8ed;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .header-cell {
+            background: #001c66;
+            color: white;
+            writing-mode: horizontal-tb;
+            text-orientation: unset;
+            min-height: 85px;
+            max-height: 85px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            padding: 4px 2px;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: none;
+            line-height: 1.1;
+            text-align: center;
+            font-size: 10px;
+            overflow: hidden;
+        }
+
+        .header-cell.corner-cell {
+            position: sticky;
+            left: 0;
+            z-index: 15;
+            background: #001c66;
+            border-right: 3px solid #667eea;
+        }
+
+        .time-header-cell {
+            background: #001c66;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            min-height: 85px;
+            max-height: 85px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 11px;
+            border-right: 3px solid #667eea;
+        }
+
+        .header-cell:hover {
+            background: #8f29fc;
+        }
+
+        .header-cell.corner-cell:hover {
+            background: #001c66;
+            cursor: default;
+        }
+
+        .capability-header {
+            cursor: pointer;
+        }
+
+        .tool-cell {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: #2c3e50;
+            font-size: 11px;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            border-right: 2px solid #667eea;
+            justify-content: flex-end;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 38px;
+            min-height: 38px;
+            max-height: 38px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .tool-cell:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+        }
+
+        .databricks-highlight {
+            /* No special styling - uses default tool-cell styling */
+        }
+
+        .time-status-cell {
+            padding: 6px;
+            border: 1px solid #e1e8ed;
+            text-align: center;
+            font-weight: 600;
+            font-size: 11px;
+            transition: all 0.3s ease;
+            cursor: default;
+            height: 38px;
+            min-height: 38px;
+            max-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 3px solid #667eea;
+        }
+
+        .time-status-invest {
+            background: #4caf50;
+            color: #2c3e50;
+        }
+
+        .time-status-tolerate {
+            background: #ffd54f;
+            color: #2c3e50;
+        }
+
+        .time-status-migrate {
+            background: #ff8c42;
+            color: #2c3e50;
+        }
+
+        .time-status-eliminate {
+            background: #f44336;
+            color: #2c3e50;
+        }
+
+        .capability-cell {
+            padding: 6px;
+            border: 1px solid #e1e8ed;
+            text-align: center;
+            font-weight: 500;
+            font-size: 12px;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 38px;
+            min-height: 38px;
+            max-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .capability-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 15;
+            position: relative;
+        }
+
+        .primary-cell {
+            background: #8f29fc;
+            color: white;
+            font-weight: bold;
+        }
+
+        .secondary-cell {
+            background: #c77cd8;
+            color: white;
+            font-weight: bold;
+        }
+
+        .tertiary-cell {
+            background: #d3cad9;
+            color: #2c3e50;
+        }
+
+        .none-cell {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: #6c757d;
+        }
+
+        .scroll-hint {
+            text-align: center;
+            margin-top: 10px;
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.show {
+            display: block;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            margin: 40px auto;
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .modal-header {
+            background: #0a142d;
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .subcapability-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .subcapability-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .subcapability-item:last-child {
+            border-bottom: none;
+        }
+
+        .subcapability-id {
+            background: #0a142d;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-right: 12px;
+            flex-shrink: 0;
+            min-width: 35px;
+            text-align: center;
+        }
+
+        .subcapability-description {
+            color: #2c3e50;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
         .refresh-btn {
             position: fixed;
             bottom: 20px;
@@ -280,67 +587,111 @@
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(143, 41, 252, 0.5);
         }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 10px;
+                max-height: 90vh;
+            }
+            
+            .modal-header {
+                padding: 15px 20px;
+            }
+            
+            .modal-title {
+                font-size: 1.2em;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .subcapability-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .subcapability-id {
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+        }
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Loading data from GitHub...</h3>
+            <p>Please wait while we fetch the latest CSV files</p>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>Analytics Tools: Rationalisation Potential</h1>
             <p>Scenario #1: Databricks as a default foundational tool across all D&A teams</p>
         </div>
 
-        <div class="error-message" id="error-message">
-            Sample error message (hidden by default)
-        </div>
+        <div class="error-message" id="error-message"></div>
 
         <div class="region-filter">
             <div class="filter-controls">
-                <label class="region-checkbox selected">
-                    <input type="checkbox" value="AMERICAS D&A" checked>
+                <label class="region-checkbox selected" id="americas-da-label">
+                    <input type="checkbox" id="americas-da" value="AMERICAS D&A" checked>
                     <span>AMERICAS D&A</span>
                 </label>
-                <label class="region-checkbox selected">
-                    <input type="checkbox" value="AMETA D&A" checked>
+                <label class="region-checkbox selected" id="ameta-da-label">
+                    <input type="checkbox" id="ameta-da" value="AMETA D&A" checked>
                     <span>AMETA D&A</span>
                 </label>
-                <label class="region-checkbox selected">
-                    <input type="checkbox" value="DIGITAL D&A" checked>
+                <label class="region-checkbox selected" id="digital-da-label">
+                    <input type="checkbox" id="digital-da" value="DIGITAL D&A" checked>
                     <span>DIGITAL D&A</span>
                 </label>
-                <label class="region-checkbox selected">
-                    <input type="checkbox" value="EUROPE D&A" checked>
+                <label class="region-checkbox selected" id="europe-da-label">
+                    <input type="checkbox" id="europe-da" value="EUROPE D&A" checked>
                     <span>EUROPE D&A</span>
                 </label>
-                <label class="region-checkbox selected">
-                    <input type="checkbox" value="ERA" checked>
+                <label class="region-checkbox selected" id="era-label">
+                    <input type="checkbox" id="era" value="ERA" checked>
                     <span>ERA</span>
                 </label>
-                <label class="region-checkbox selected">
-                    <input type="checkbox" value="GAC" checked>
+                <label class="region-checkbox selected" id="gac-label">
+                    <input type="checkbox" id="gac" value="GAC" checked>
                     <span>GAC</span>
                 </label>
                 <div class="filter-actions">
-                    <button class="filter-btn">Select All</button>
-                    <button class="filter-btn">Clear All</button>
+                    <button class="filter-btn" id="select-all">Select All</button>
+                    <button class="filter-btn" id="clear-all">Clear All</button>
                 </div>
             </div>
         </div>
 
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-number">125</div>
+                <div class="stat-number" id="tools-count">0</div>
                 <div class="stat-label">Total Tools Analysed</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">26</div>
+                <div class="stat-number" id="capabilities-count">0</div>
                 <div class="stat-label">Level 2 Capabilities</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">47</div>
+                <div class="stat-number" id="high-potential-count">0</div>
                 <div class="stat-label">Tools with High Rationalisation Potential</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">32-45%</div>
+                <div class="stat-number" id="reduction-potential">0%</div>
                 <div class="stat-label">Potential Tool Reduction</div>
             </div>
         </div>
@@ -365,21 +716,569 @@
         </div>
 
         <div class="heatmap-container">
-            <div class="heatmap empty">
-                <div style="text-align: center; padding: 40px;">
-                    This is a preview showing the updated color scheme:<br><br>
-                    • Background: #262f45 (dark blue-gray)<br>
-                    • Stats cards: #8f29fc (bright purple)<br>
-                    • Regional filter buttons: #001c66 (dark navy blue)
-                </div>
+            <div class="heatmap" id="heatmap">
+                <!-- This will be populated by JavaScript -->
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 10px; color: #6c757d; font-style: italic; font-size: 0.9em;">
-            Color scheme updated successfully
+        <div class="scroll-hint">
+            ← Scroll horizontally to view all capabilities →
         </div>
     </div>
 
-    <button class="refresh-btn" title="Refresh data">↻</button>
+    <button class="refresh-btn" id="refresh-btn" title="Refresh data from GitHub">↻</button>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="capabilityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Capability Details</h3>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="modal-body">
+                <ul class="subcapability-list" id="modalContent">
+                    <!-- Subcapabilities will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        // ============================================
+        // CONFIGURATION - YOUR GITHUB CSV URLS
+        // ============================================
+        const GITHUB_CSV_URLS = {
+            tools: 'https://raw.githubusercontent.com/kd-gitgub/aom-tool-heatmap-v1/main/tools-data.csv',
+            subcapabilities: 'https://raw.githubusercontent.com/kd-gitgub/aom-tool-heatmap-v1/main/subcapabilities-data.csv'
+        };
+
+        // ============================================
+        // END CONFIGURATION
+        // ============================================
+
+        // Global variables for storing data
+        let toolsData = null;
+        let subcapabilitiesData = {};
+        let capabilities = [];
+        let selectedRegions = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
+        let regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
+
+        // Load data from GitHub on page load
+        async function loadDataFromGitHub() {
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('error-message');
+            
+            loading.style.display = 'flex';
+            errorDiv.classList.remove('show');
+
+            try {
+                // Fetch both CSV files from GitHub
+                const [toolsResponse, subcapResponse] = await Promise.all([
+                    fetch(GITHUB_CSV_URLS.tools),
+                    fetch(GITHUB_CSV_URLS.subcapabilities)
+                ]);
+
+                if (!toolsResponse.ok || !subcapResponse.ok) {
+                    throw new Error('Failed to fetch CSV files from GitHub');
+                }
+
+                const toolsContent = await toolsResponse.text();
+                const subcapContent = await subcapResponse.text();
+
+                // Process the data
+                processToolsData(toolsContent);
+                processSubcapabilitiesData(subcapContent);
+                
+                // Initialize the heatmap
+                initializeHeatmap();
+                
+                loading.style.display = 'none';
+            } catch (error) {
+                console.error('Error loading data:', error);
+                loading.style.display = 'none';
+                
+                errorDiv.innerHTML = `
+                    <strong>Error loading data:</strong> ${error.message}<br>
+                    Please check that the CSV files exist at the configured GitHub URLs.<br>
+                    <small>Tools URL: ${GITHUB_CSV_URLS.tools}<br>
+                    Subcapabilities URL: ${GITHUB_CSV_URLS.subcapabilities}</small>
+                `;
+                errorDiv.classList.add('show');
+                
+                // Show empty heatmap
+                updateHeatmap();
+            }
+        }
+
+        function processToolsData(csvContent) {
+            const parsed = Papa.parse(csvContent, {
+                header: true,
+                skipEmptyLines: true,
+                dynamicTyping: true
+            });
+
+            // Extract tools and capability names
+            const allRows = parsed.data;
+            const capabilityNamesRow = allRows.find(row => row.Tool === "CAPABILITY_NAMES");
+            const toolRows = allRows.filter(row => row.Tool !== "CAPABILITY_NAMES");
+
+            // Sort capability columns numerically
+            const capColumns = Object.keys(parsed.data[0] || {})
+                .filter(col => col.startsWith('Cap'))
+                .sort((a, b) => {
+                    const numA = parseInt(a.replace('Cap', ''));
+                    const numB = parseInt(b.replace('Cap', ''));
+                    return numA - numB;
+                });
+
+            // Extract capabilities and region columns
+            capabilities = capColumns.map(col => capabilityNamesRow[col] || `Capability ${col.replace('Cap', '')}`);
+            regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
+
+            // Store the tools data
+            toolsData = toolRows;
+        }
+
+        function processSubcapabilitiesData(csvContent) {
+            const parsed = Papa.parse(csvContent, {
+                header: true,
+                skipEmptyLines: true,
+                dynamicTyping: true
+            });
+
+            // Reset subcapabilities data
+            subcapabilitiesData = {};
+            
+            // Track counts per capability to auto-fix duplicate IDs
+            const capabilityCounts = {};
+
+            // Process each row
+            parsed.data.forEach(row => {
+                const capId = parseInt(
+                    row.Capability_ID || 
+                    row['Capability ID'] || 
+                    row.CapabilityID || 
+                    row.capability_id || 
+                    row.cap_id
+                );
+                
+                let subId = 
+                    row.Subcapability_ID || 
+                    row['Subcapability ID'] || 
+                    row.SubcapabilityID || 
+                    row.subcapability_id || 
+                    row.sub_id || 
+                    row.ID;
+                
+                const desc = 
+                    row.Subcapability_Description || 
+                    row['Subcapability Description'] || 
+                    row.Description || 
+                    row.description || 
+                    row.desc;
+
+                let fullDesc = desc || '';
+                
+                if (desc && (row[''] || row['_1'] || row['_2'])) {
+                    const parts = [desc];
+                    if (row['']) parts.push(row['']);
+                    if (row['_1']) parts.push(row['_1']);  
+                    if (row['_2']) parts.push(row['_2']);
+                    fullDesc = parts.filter(Boolean).join(', ');
+                }
+
+                if (capId && subId && fullDesc) {
+                    if (!subcapabilitiesData[capId]) {
+                        subcapabilitiesData[capId] = [];
+                        capabilityCounts[capId] = 0;
+                    }
+                    
+                    capabilityCounts[capId]++;
+                    if (capabilityCounts[capId] === 10 && subId === `${capId}.1`) {
+                        subId = `${capId}.10`;
+                    }
+                    
+                    const existingIndex = subcapabilitiesData[capId].findIndex(item => item.id === subId);
+                    if (existingIndex !== -1) {
+                        subId = `${capId}.10`;
+                    }
+                    
+                    subcapabilitiesData[capId].push({
+                        id: subId,
+                        desc: fullDesc
+                    });
+                }
+            });
+        }
+
+        function initializeHeatmap() {
+            // Setup event listeners
+            setupEventListeners();
+
+            // Initial render
+            updateHeatmap();
+        }
+
+        function updateHeatmap() {
+            const heatmap = document.getElementById('heatmap');
+            heatmap.innerHTML = '';
+
+            if (!toolsData || toolsData.length === 0) {
+                heatmap.className = 'heatmap empty';
+                heatmap.innerHTML = '<div style="text-align: center; padding: 40px;">Loading data from GitHub...</div>';
+                return;
+            }
+
+            // Filter tools by selected regions
+            const filteredTools = toolsData.filter(row => 
+                selectedRegions.some(region => row[region] === 1)
+            ).sort((a, b) => a.Tool.localeCompare(b.Tool));
+
+            if (filteredTools.length === 0) {
+                heatmap.className = 'heatmap empty';
+                heatmap.innerHTML = '<div style="text-align: center; padding: 40px;">Select regions to view data</div>';
+                
+                document.getElementById('tools-count').textContent = '0';
+                document.getElementById('capabilities-count').textContent = capabilities.length;
+                document.getElementById('high-potential-count').textContent = '0';
+                document.getElementById('reduction-potential').textContent = '0%';
+                return;
+            }
+
+            heatmap.className = 'heatmap';
+
+            // Update grid template columns
+            heatmap.style.gridTemplateColumns = `320px 100px repeat(${capabilities.length}, minmax(100px, 1fr))`;
+            heatmap.style.minWidth = `${320 + 100 + (capabilities.length * 100)}px`;
+
+            // Corner cell
+            const cornerCell = document.createElement('div');
+            cornerCell.className = 'header-cell corner-cell';
+            cornerCell.textContent = 'ANALYTICS TOOLS';
+            cornerCell.style.fontSize = '14px';
+            cornerCell.style.fontWeight = 'bold';
+            cornerCell.style.justifyContent = 'flex-end';
+            cornerCell.style.paddingRight = '25px';
+            heatmap.appendChild(cornerCell);
+
+            // TIME Status header
+            const timeHeaderCell = document.createElement('div');
+            timeHeaderCell.className = 'time-header-cell';
+            timeHeaderCell.innerHTML = '<div><strong>TIME</strong><br>Status</div>';
+            heatmap.appendChild(timeHeaderCell);
+
+            // Capability headers
+            capabilities.forEach((capability, index) => {
+                const headerCell = document.createElement('div');
+                headerCell.className = 'header-cell capability-header';
+                headerCell.innerHTML = `<div><strong>${index + 1}.</strong><br>${capability}</div>`;
+                headerCell.setAttribute('data-capability-index', index + 1);
+                headerCell.addEventListener('click', () => showCapabilityModal(index + 1, capability));
+                heatmap.appendChild(headerCell);
+            });
+
+            // Tool rows
+            filteredTools.forEach(toolRow => {
+                // Tool name cell
+                const toolCell = document.createElement('div');
+                toolCell.className = 'tool-cell';
+                if (toolRow.Tool.toLowerCase().includes('databricks')) {
+                    toolCell.classList.add('databricks-highlight');
+                }
+                toolCell.textContent = toolRow.Tool;
+                toolCell.addEventListener('click', () => showToolModal(toolRow));
+                heatmap.appendChild(toolCell);
+
+                // TIME Status cell
+                const timeStatusCell = document.createElement('div');
+                timeStatusCell.className = 'time-status-cell';
+                const timeStatus = toolRow['TIME Status'] || '';
+                
+                switch(timeStatus.toLowerCase()) {
+                    case 'invest':
+                        timeStatusCell.classList.add('time-status-invest');
+                        timeStatusCell.textContent = 'Invest';
+                        break;
+                    case 'tolerate':
+                        timeStatusCell.classList.add('time-status-tolerate');
+                        timeStatusCell.textContent = 'Tolerate';
+                        break;
+                    case 'migrate':
+                        timeStatusCell.classList.add('time-status-migrate');
+                        timeStatusCell.textContent = 'Migrate';
+                        break;
+                    case 'eliminate':
+                        timeStatusCell.classList.add('time-status-eliminate');
+                        timeStatusCell.textContent = 'Eliminate';
+                        break;
+                    default:
+                        timeStatusCell.style.background = 'linear-gradient(135deg, #f8f9fa, #e9ecef)';
+                        timeStatusCell.style.color = '#6c757d';
+                        timeStatusCell.textContent = '-';
+                }
+                
+                heatmap.appendChild(timeStatusCell);
+
+                // Capability cells
+                capabilities.forEach((capability, capIndex) => {
+                    const capColumnName = `Cap${capIndex + 1}`;
+                    const score = parseInt(toolRow[capColumnName]) || 0;
+
+                    const cell = document.createElement('div');
+                    cell.className = 'capability-cell';
+
+                    switch(score) {
+                        case 3:
+                            cell.classList.add('primary-cell');
+                            cell.textContent = 'P';
+                            break;
+                        case 2:
+                            cell.classList.add('secondary-cell');
+                            cell.textContent = 'S';
+                            break;
+                        case 1:
+                            cell.classList.add('tertiary-cell');
+                            cell.textContent = 'T';
+                            break;
+                        default:
+                            cell.classList.add('none-cell');
+                            cell.textContent = '-';
+                    }
+
+                    heatmap.appendChild(cell);
+                });
+            });
+
+            // Update stats
+            updateStats(filteredTools);
+        }
+
+        function updateStats(filteredTools) {
+            document.getElementById('tools-count').textContent = filteredTools.length;
+            document.getElementById('capabilities-count').textContent = capabilities.length;
+            
+            const highPotentialCount = filteredTools.filter(row => {
+                let highScores = 0;
+                for (let i = 1; i <= capabilities.length; i++) {
+                    const score = parseInt(row[`Cap${i}`]) || 0;
+                    if (score >= 3) highScores++;
+                }
+                return highScores >= 3;
+            }).length;
+            
+            document.getElementById('high-potential-count').textContent = highPotentialCount;
+            
+            const totalTools = filteredTools.length;
+            if (totalTools > 0) {
+                const reductionPercentage = Math.round((highPotentialCount / totalTools) * 100);
+                const reductionRange = `${Math.max(reductionPercentage - 5, 0)}-${Math.min(reductionPercentage + 10, 100)}%`;
+                document.getElementById('reduction-potential').textContent = reductionRange;
+            } else {
+                document.getElementById('reduction-potential').textContent = '0%';
+            }
+        }
+
+        function setupEventListeners() {
+            // Region filter event listeners
+            document.querySelectorAll('.region-checkbox input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', handleRegionChange);
+            });
+
+            document.getElementById('select-all').addEventListener('click', () => {
+                selectedRegions = [...regionColumns];
+                updateRegionCheckboxes();
+                updateHeatmap();
+            });
+
+            document.getElementById('clear-all').addEventListener('click', () => {
+                selectedRegions = [];
+                updateRegionCheckboxes();
+                updateHeatmap();
+            });
+
+            // Refresh button
+            document.getElementById('refresh-btn').addEventListener('click', () => {
+                loadDataFromGitHub();
+            });
+
+            // Modal event listeners
+            document.getElementById('modalClose').addEventListener('click', closeModal);
+            
+            document.getElementById('capabilityModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('capabilityModal');
+                    if (modal.classList.contains('show')) {
+                        closeModal();
+                    }
+                }
+            });
+        }
+
+        function handleRegionChange() {
+            const checkboxes = document.querySelectorAll('.region-checkbox input[type="checkbox"]');
+            selectedRegions = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            updateRegionCheckboxes();
+            updateHeatmap();
+        }
+
+        function updateRegionCheckboxes() {
+            document.querySelectorAll('.region-checkbox').forEach(label => {
+                const checkbox = label.querySelector('input');
+                if (selectedRegions.includes(checkbox.value)) {
+                    label.classList.add('selected');
+                    checkbox.checked = true;
+                } else {
+                    label.classList.remove('selected');
+                    checkbox.checked = false;
+                }
+            });
+        }
+
+        function showCapabilityModal(capabilityIndex, capabilityName) {
+            const modal = document.getElementById('capabilityModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = `${capabilityIndex}. ${capabilityName}`;
+            modalContent.innerHTML = '';
+            
+            const subcapabilities = subcapabilitiesData[capabilityIndex] || [];
+            
+            const sortedSubcapabilities = subcapabilities.sort((a, b) => {
+                const aParts = String(a.id).split('.').map(num => parseInt(num));
+                const bParts = String(b.id).split('.').map(num => parseInt(num));
+                
+                if (aParts[0] !== bParts[0]) {
+                    return aParts[0] - bParts[0];
+                }
+                
+                const aSubNum = aParts[1] || 0;
+                const bSubNum = bParts[1] || 0;
+                return aSubNum - bSubNum;
+            });
+            
+            if (sortedSubcapabilities.length === 0) {
+                const emptyMessage = document.createElement('li');
+                emptyMessage.className = 'subcapability-item';
+                emptyMessage.innerHTML = '<div style="color: #666; font-style: italic;">No subcapabilities found for this capability.</div>';
+                modalContent.appendChild(emptyMessage);
+            } else {
+                sortedSubcapabilities.forEach(subcap => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'subcapability-item';
+                    listItem.innerHTML = `
+                        <div class="subcapability-id">${subcap.id}</div>
+                        <div class="subcapability-description">${subcap.desc}</div>
+                    `;
+                    modalContent.appendChild(listItem);
+                });
+            }
+            
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showToolModal(toolData) {
+            const modal = document.getElementById('capabilityModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = toolData.Tool;
+            modalContent.innerHTML = '';
+            
+            const timeStatus = toolData['TIME Status'] || 'Not Set';
+            let timeStatusColor = '#6c757d';
+            let timeStatusBg = '#f8f9fa';
+            
+            switch(timeStatus.toLowerCase()) {
+                case 'invest':
+                    timeStatusColor = 'white';
+                    timeStatusBg = '#28a745';
+                    break;
+                case 'tolerate':
+                    timeStatusColor = '#212529';
+                    timeStatusBg = '#ffc107';
+                    break;
+                case 'migrate':
+                    timeStatusColor = 'white';
+                    timeStatusBg = '#fd7e14';
+                    break;
+                case 'eliminate':
+                    timeStatusColor = 'white';
+                    timeStatusBg = '#dc3545';
+                    break;
+            }
+            
+            const descriptionDiv = document.createElement('div');
+            descriptionDiv.style.padding = '0';
+            descriptionDiv.innerHTML = `
+                <div style="margin-bottom: 20px; line-height: 1.6; color: #2c3e50; font-size: 1em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                    ${toolData.Description || 'No description available'}
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">TIME Status:</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: ${timeStatusBg}; color: ${timeStatusColor}; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em; font-weight: 600; display: inline-block;">
+                            ${timeStatus}
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Primary SysAdmin:</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em;">
+                            ████████@████████.com
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Budget holder(s):</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em;">
+                            ████████@████████.com, ████████@████████.com
+                        </div>
+                    </div>
+                </div>
+                ${toolData.URL ? `<div style="margin-top: 20px;">
+                    <a href="${toolData.URL}" target="_blank" style="
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='linear-gradient(135deg, #5a6fd8, #6a42a0)'" 
+                       onmouseout="this.style.background='linear-gradient(135deg, #667eea, #764ba2)'">
+                        Visit tool website →
+                    </a>
+                </div>` : ''}
+            `;
+            
+            modalContent.appendChild(descriptionDiv);
+            
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('capabilityModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromGitHub();
+        });
+    </script>
 </body>
 </html>
