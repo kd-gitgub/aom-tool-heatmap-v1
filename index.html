@@ -461,6 +461,7 @@
             font-size: 0.9em;
         }
 
+        /* FIXED MODAL STYLES */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -472,12 +473,14 @@
             backdrop-filter: blur(5px);
             z-index: 1000;
             animation: fadeIn 0.3s ease;
-            overflow-y: auto;
+            /* Center modal vertically and horizontally */
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
         .modal-overlay.show {
-            display: block;
-            padding: 20px;
+            display: flex;
         }
 
         .modal-content {
@@ -489,14 +492,13 @@
             max-height: 85vh;
             overflow-y: auto;
             position: relative;
-            margin: 40px auto;
-            transform: scale(0.9) translateY(20px);
+            transform: scale(0.9);
             opacity: 0;
             transition: all 0.3s ease;
         }
 
         .modal-overlay.show .modal-content {
-            transform: scale(1) translateY(0);
+            transform: scale(1);
             opacity: 1;
         }
 
@@ -1192,6 +1194,8 @@
                 });
             }
             
+            // Scroll modal content to top when opening
+            modalContent.scrollTop = 0;
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
@@ -1273,6 +1277,8 @@
             
             modalContent.appendChild(descriptionDiv);
             
+            // Scroll modal content to top when opening
+            modalContent.scrollTop = 0;
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
