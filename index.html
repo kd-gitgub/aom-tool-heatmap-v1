@@ -260,6 +260,15 @@
             line-height: 1.2;
         }
 
+        .heatmap.empty {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            font-size: 1.2em;
+            color: #666;
+        }
+
         .heatmap.headers-only {
             min-height: 200px;
         }
@@ -372,6 +381,10 @@
             background: linear-gradient(135deg, #e9ecef, #dee2e6);
         }
 
+        .databricks-highlight {
+            /* No special styling - uses default tool-cell styling */
+        }
+
         .time-status-cell {
             padding: 6px;
             border: 1px solid #e1e8ed;
@@ -463,7 +476,7 @@
             font-size: 0.9em;
         }
 
-        /* MODAL STYLES */
+        /* FIXED MODAL STYLES */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -475,6 +488,7 @@
             backdrop-filter: blur(5px);
             z-index: 1000;
             animation: fadeIn 0.3s ease;
+            /* Center modal vertically and horizontally */
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -607,14 +621,43 @@
                 opacity: 1;
             }
         }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                margin: 10px;
+                max-height: 90vh;
+            }
+            
+            .modal-header {
+                padding: 15px 20px;
+            }
+            
+            .modal-title {
+                font-size: 1.2em;
+            }
+            
+            .modal-body {
+                padding: 20px;
+            }
+            
+            .subcapability-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .subcapability-id {
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="loading-overlay" id="loading">
         <div class="loading-content">
             <div class="spinner"></div>
-            <h3>Loading demo data...</h3>
-            <p>Preparing interactive example</p>
+            <h3>Loading data from GitHub...</h3>
+            <p>Please wait while we fetch the latest CSV files</p>
         </div>
     </div>
 
@@ -708,7 +751,7 @@
         </div>
     </div>
 
-    <button class="refresh-btn" id="refresh-btn" title="Refresh data">↻</button>
+    <button class="refresh-btn" id="refresh-btn" title="Refresh data from GitHub">↻</button>
 
     <!-- Modal -->
     <div class="modal-overlay" id="capabilityModal">
@@ -725,79 +768,193 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
-        // Demo data for testing
+        // ============================================
+        // CONFIGURATION - YOUR GITHUB CSV URLS
+        // ============================================
+        const GITHUB_CSV_URLS = {
+            tools: 'https://raw.githubusercontent.com/kd-gitgub/aom-tool-heatmap-v1/main/tools-data.csv',
+            subcapabilities: 'https://raw.githubusercontent.com/kd-gitgub/aom-tool-heatmap-v1/main/subcapabilities-data.csv'
+        };
+
+        // ============================================
+        // END CONFIGURATION
+        // ============================================
+
+        // Global variables for storing data
         let toolsData = null;
         let subcapabilitiesData = {};
         let capabilities = [];
         let selectedRegions = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
         let regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
 
-        // Generate demo data
-        function generateDemoData() {
-            // Generate capabilities
-            capabilities = [
-                'Data Storage & Management',
-                'Data Processing & ETL',
-                'Business Intelligence',
-                'Advanced Analytics',
-                'Machine Learning',
-                'Data Visualization',
-                'Data Governance',
-                'Real-time Analytics',
-                'Cloud Integration',
-                'API Management',
-                'Data Security',
-                'Collaboration Tools'
-            ];
+        // Load data from GitHub on page load
+        async function loadDataFromGitHub() {
+            const loading = document.getElementById('loading');
+            const errorDiv = document.getElementById('error-message');
+            
+            loading.style.display = 'flex';
+            errorDiv.classList.remove('show');
 
-            // Generate subcapabilities
-            capabilities.forEach((cap, index) => {
-                const capId = index + 1;
-                subcapabilitiesData[capId] = [];
-                for (let i = 1; i <= 5; i++) {
+            try {
+                // Fetch both CSV files from GitHub
+                const [toolsResponse, subcapResponse] = await Promise.all([
+                    fetch(GITHUB_CSV_URLS.tools),
+                    fetch(GITHUB_CSV_URLS.subcapabilities)
+                ]);
+
+                if (!toolsResponse.ok || !subcapResponse.ok) {
+                    throw new Error('Failed to fetch CSV files from GitHub');
+                }
+
+                const toolsContent = await toolsResponse.text();
+                const subcapContent = await subcapResponse.text();
+
+                // Process the data
+                processToolsData(toolsContent);
+                processSubcapabilitiesData(subcapContent);
+                
+                // Initialize the heatmap
+                initializeHeatmap();
+                
+                loading.style.display = 'none';
+            } catch (error) {
+                console.error('Error loading data:', error);
+                loading.style.display = 'none';
+                
+                errorDiv.innerHTML = `
+                    <strong>Error loading data:</strong> ${error.message}<br>
+                    Please check that the CSV files exist at the configured GitHub URLs.<br>
+                    <small>Tools URL: ${GITHUB_CSV_URLS.tools}<br>
+                    Subcapabilities URL: ${GITHUB_CSV_URLS.subcapabilities}</small>
+                `;
+                errorDiv.classList.add('show');
+                
+                // Show empty heatmap
+                updateHeatmap();
+            }
+        }
+
+        function processToolsData(csvContent) {
+            const parsed = Papa.parse(csvContent, {
+                header: true,
+                skipEmptyLines: true,
+                dynamicTyping: true
+            });
+
+            // Extract tools and capability names
+            const allRows = parsed.data;
+            const capabilityNamesRow = allRows.find(row => row.Tool === "CAPABILITY_NAMES");
+            const toolRows = allRows.filter(row => row.Tool !== "CAPABILITY_NAMES");
+
+            // Sort capability columns numerically
+            const capColumns = Object.keys(parsed.data[0] || {})
+                .filter(col => col.startsWith('Cap'))
+                .sort((a, b) => {
+                    const numA = parseInt(a.replace('Cap', ''));
+                    const numB = parseInt(b.replace('Cap', ''));
+                    return numA - numB;
+                });
+
+            // Extract capabilities and region columns
+            capabilities = capColumns.map(col => capabilityNamesRow[col] || `Capability ${col.replace('Cap', '')}`);
+            regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
+
+            // Store the tools data
+            toolsData = toolRows;
+        }
+
+        function processSubcapabilitiesData(csvContent) {
+            const parsed = Papa.parse(csvContent, {
+                header: true,
+                skipEmptyLines: true,
+                dynamicTyping: true
+            });
+
+            // Reset subcapabilities data
+            subcapabilitiesData = {};
+            
+            // Track counts per capability to auto-fix duplicate IDs
+            const capabilityCounts = {};
+
+            // Process each row
+            parsed.data.forEach(row => {
+                const capId = parseInt(
+                    row.Capability_ID || 
+                    row['Capability ID'] || 
+                    row.CapabilityID || 
+                    row.capability_id || 
+                    row.cap_id
+                );
+                
+                let subId = 
+                    row.Subcapability_ID || 
+                    row['Subcapability ID'] || 
+                    row.SubcapabilityID || 
+                    row.subcapability_id || 
+                    row.sub_id || 
+                    row.ID;
+                
+                const desc = 
+                    row.Subcapability_Description || 
+                    row['Subcapability Description'] || 
+                    row.Description || 
+                    row.description || 
+                    row.desc;
+
+                let fullDesc = desc || '';
+                
+                if (desc && (row[''] || row['_1'] || row['_2'])) {
+                    const parts = [desc];
+                    if (row['']) parts.push(row['']);
+                    if (row['_1']) parts.push(row['_1']);  
+                    if (row['_2']) parts.push(row['_2']);
+                    fullDesc = parts.filter(Boolean).join(', ');
+                }
+
+                if (capId && subId && fullDesc) {
+                    if (!subcapabilitiesData[capId]) {
+                        subcapabilitiesData[capId] = [];
+                        capabilityCounts[capId] = 0;
+                    }
+                    
+                    capabilityCounts[capId]++;
+                    if (capabilityCounts[capId] === 10 && subId === `${capId}.1`) {
+                        subId = `${capId}.10`;
+                    }
+                    
+                    const existingIndex = subcapabilitiesData[capId].findIndex(item => item.id === subId);
+                    if (existingIndex !== -1) {
+                        subId = `${capId}.10`;
+                    }
+                    
                     subcapabilitiesData[capId].push({
-                        id: `${capId}.${i}`,
-                        desc: `${cap} - Subcapability ${i}: Example functionality for ${cap.toLowerCase()}`
+                        id: subId,
+                        desc: fullDesc
                     });
                 }
             });
+        }
 
-            // Generate tools data
-            const toolNames = [
-                'Databricks', 'Snowflake', 'AWS Redshift', 'Azure Synapse',
-                'Tableau', 'Power BI', 'Looker', 'Qlik Sense',
-                'Apache Spark', 'Apache Airflow', 'Informatica', 'Talend',
-                'SAS', 'SPSS', 'Python', 'R Studio'
-            ];
+        function initializeHeatmap() {
+            // Setup event listeners
+            setupEventListeners();
 
-            toolsData = toolNames.map(tool => {
-                const row = { Tool: tool };
-                
-                // Assign regions randomly
-                regionColumns.forEach(region => {
-                    row[region] = Math.random() > 0.5 ? 1 : 0;
-                });
-
-                // Assign TIME Status
-                const statuses = ['Invest', 'Tolerate', 'Migrate', 'Eliminate'];
-                row['TIME Status'] = statuses[Math.floor(Math.random() * statuses.length)];
-
-                // Assign capability scores
-                capabilities.forEach((cap, index) => {
-                    const score = Math.floor(Math.random() * 4); // 0-3
-                    row[`Cap${index + 1}`] = score;
-                });
-
-                row.Description = `${tool} is a powerful analytics platform providing comprehensive data solutions.`;
-                
-                return row;
-            });
+            // Initial render
+            updateHeatmap();
         }
 
         function updateHeatmap() {
             const heatmap = document.getElementById('heatmap');
             heatmap.innerHTML = '';
+
+            // Check if data is loaded
+            if (!toolsData || toolsData.length === 0 || capabilities.length === 0) {
+                heatmap.className = 'heatmap empty';
+                heatmap.innerHTML = '<div style="text-align: center; padding: 40px;">Loading data from GitHub...</div>';
+                return;
+            }
 
             // Always set up the grid structure
             heatmap.className = 'heatmap';
@@ -831,16 +988,6 @@
                 heatmap.appendChild(headerCell);
             });
 
-            // Check if we need to show tools or just a message
-            if (!toolsData || toolsData.length === 0) {
-                // No data loaded yet
-                const noDataMsg = document.createElement('div');
-                noDataMsg.className = 'no-data-message';
-                noDataMsg.textContent = 'Loading data...';
-                heatmap.appendChild(noDataMsg);
-                return;
-            }
-
             // Filter tools by selected regions
             const filteredTools = toolsData.filter(row => 
                 selectedRegions.some(region => row[region] === 1)
@@ -870,8 +1017,7 @@
                 const toolCell = document.createElement('div');
                 toolCell.className = 'tool-cell';
                 if (toolRow.Tool.toLowerCase().includes('databricks')) {
-                    toolCell.style.fontWeight = 'bold';
-                    toolCell.style.color = '#0079FF';
+                    toolCell.classList.add('databricks-highlight');
                 }
                 toolCell.textContent = toolRow.Tool;
                 toolCell.addEventListener('click', () => showToolModal(toolRow));
@@ -966,97 +1112,6 @@
             }
         }
 
-        function showCapabilityModal(capabilityIndex, capabilityName) {
-            const modal = document.getElementById('capabilityModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalContent = document.getElementById('modalContent');
-            
-            modalTitle.textContent = `${capabilityIndex}. ${capabilityName}`;
-            modalContent.innerHTML = '';
-            
-            const subcapabilities = subcapabilitiesData[capabilityIndex] || [];
-            
-            if (subcapabilities.length === 0) {
-                const emptyMessage = document.createElement('li');
-                emptyMessage.className = 'subcapability-item';
-                emptyMessage.innerHTML = '<div style="color: #666; font-style: italic;">No subcapabilities found for this capability.</div>';
-                modalContent.appendChild(emptyMessage);
-            } else {
-                subcapabilities.forEach(subcap => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'subcapability-item';
-                    listItem.innerHTML = `
-                        <div class="subcapability-id">${subcap.id}</div>
-                        <div class="subcapability-description">${subcap.desc}</div>
-                    `;
-                    modalContent.appendChild(listItem);
-                });
-            }
-            
-            modalContent.scrollTop = 0;
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function showToolModal(toolData) {
-            const modal = document.getElementById('capabilityModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalContent = document.getElementById('modalContent');
-            
-            modalTitle.textContent = toolData.Tool;
-            modalContent.innerHTML = '';
-            
-            const timeStatus = toolData['TIME Status'] || 'Not Set';
-            let timeStatusColor = '#6c757d';
-            let timeStatusBg = '#f8f9fa';
-            
-            switch(timeStatus.toLowerCase()) {
-                case 'invest':
-                    timeStatusColor = 'white';
-                    timeStatusBg = '#28a745';
-                    break;
-                case 'tolerate':
-                    timeStatusColor = '#212529';
-                    timeStatusBg = '#ffc107';
-                    break;
-                case 'migrate':
-                    timeStatusColor = 'white';
-                    timeStatusBg = '#fd7e14';
-                    break;
-                case 'eliminate':
-                    timeStatusColor = 'white';
-                    timeStatusBg = '#dc3545';
-                    break;
-            }
-            
-            const descriptionDiv = document.createElement('div');
-            descriptionDiv.style.padding = '0';
-            descriptionDiv.innerHTML = `
-                <div style="margin-bottom: 20px; line-height: 1.6; color: #2c3e50; font-size: 1em;">
-                    ${toolData.Description || 'No description available'}
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <div style="margin-bottom: 10px;">
-                        <strong style="color: #495057; font-size: 0.95em;">TIME Status:</strong>
-                        <div style="margin-top: 4px; padding: 8px 12px; background: ${timeStatusBg}; color: ${timeStatusColor}; border-radius: 4px; border: 1px solid #e9ecef; font-size: 1em; font-weight: 600; display: inline-block;">
-                            ${timeStatus}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            modalContent.appendChild(descriptionDiv);
-            modalContent.scrollTop = 0;
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('capabilityModal');
-            modal.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-
         function setupEventListeners() {
             // Region filter event listeners
             document.querySelectorAll('.region-checkbox input[type="checkbox"]').forEach(checkbox => {
@@ -1077,7 +1132,7 @@
 
             // Refresh button
             document.getElementById('refresh-btn').addEventListener('click', () => {
-                initializeWithDemoData();
+                loadDataFromGitHub();
             });
 
             // Modal event listeners
@@ -1122,21 +1177,144 @@
             });
         }
 
-        function initializeWithDemoData() {
-            const loading = document.getElementById('loading');
-            loading.style.display = 'flex';
+        function showCapabilityModal(capabilityIndex, capabilityName) {
+            const modal = document.getElementById('capabilityModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
             
-            setTimeout(() => {
-                generateDemoData();
-                setupEventListeners();
-                updateHeatmap();
-                loading.style.display = 'none';
-            }, 500);
+            modalTitle.textContent = `${capabilityIndex}. ${capabilityName}`;
+            modalContent.innerHTML = '';
+            
+            const subcapabilities = subcapabilitiesData[capabilityIndex] || [];
+            
+            const sortedSubcapabilities = subcapabilities.sort((a, b) => {
+                const aParts = String(a.id).split('.').map(num => parseInt(num));
+                const bParts = String(b.id).split('.').map(num => parseInt(num));
+                
+                if (aParts[0] !== bParts[0]) {
+                    return aParts[0] - bParts[0];
+                }
+                
+                const aSubNum = aParts[1] || 0;
+                const bSubNum = bParts[1] || 0;
+                return aSubNum - bSubNum;
+            });
+            
+            if (sortedSubcapabilities.length === 0) {
+                const emptyMessage = document.createElement('li');
+                emptyMessage.className = 'subcapability-item';
+                emptyMessage.innerHTML = '<div style="color: #666; font-style: italic;">No subcapabilities found for this capability.</div>';
+                modalContent.appendChild(emptyMessage);
+            } else {
+                sortedSubcapabilities.forEach(subcap => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'subcapability-item';
+                    listItem.innerHTML = `
+                        <div class="subcapability-id">${subcap.id}</div>
+                        <div class="subcapability-description">${subcap.desc}</div>
+                    `;
+                    modalContent.appendChild(listItem);
+                });
+            }
+            
+            // Scroll modal content to top when opening
+            modalContent.scrollTop = 0;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
         }
 
-        // Initialize on page load
+        function showToolModal(toolData) {
+            const modal = document.getElementById('capabilityModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = toolData.Tool;
+            modalContent.innerHTML = '';
+            
+            const timeStatus = toolData['TIME Status'] || 'Not Set';
+            let timeStatusColor = '#6c757d';
+            let timeStatusBg = '#f8f9fa';
+            
+            switch(timeStatus.toLowerCase()) {
+                case 'invest':
+                    timeStatusColor = 'white';
+                    timeStatusBg = '#28a745';
+                    break;
+                case 'tolerate':
+                    timeStatusColor = '#212529';
+                    timeStatusBg = '#ffc107';
+                    break;
+                case 'migrate':
+                    timeStatusColor = 'white';
+                    timeStatusBg = '#fd7e14';
+                    break;
+                case 'eliminate':
+                    timeStatusColor = 'white';
+                    timeStatusBg = '#dc3545';
+                    break;
+            }
+            
+            const descriptionDiv = document.createElement('div');
+            descriptionDiv.style.padding = '0';
+            descriptionDiv.innerHTML = `
+                <div style="margin-bottom: 20px; line-height: 1.6; color: #2c3e50; font-size: 1em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                    ${toolData.Description || 'No description available'}
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">TIME Status:</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: ${timeStatusBg}; color: ${timeStatusColor}; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em; font-weight: 600; display: inline-block;">
+                            ${timeStatus}
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Primary SysAdmin:</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em;">
+                            ████████@████████.com
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Budget holder(s):</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em;">
+                            ████████@████████.com, ████████@████████.com
+                        </div>
+                    </div>
+                </div>
+                ${toolData.URL ? `<div style="margin-top: 20px;">
+                    <a href="${toolData.URL}" target="_blank" style="
+                        display: inline-block;
+                        padding: 10px 20px;
+                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='linear-gradient(135deg, #5a6fd8, #6a42a0)'" 
+                       onmouseout="this.style.background='linear-gradient(135deg, #667eea, #764ba2)'">
+                        Visit tool website →
+                    </a>
+                </div>` : ''}
+            `;
+            
+            modalContent.appendChild(descriptionDiv);
+            
+            // Scroll modal content to top when opening
+            modalContent.scrollTop = 0;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('capabilityModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Load data when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            initializeWithDemoData();
+            loadDataFromGitHub();
         });
     </script>
 </body>
