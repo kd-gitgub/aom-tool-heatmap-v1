@@ -343,6 +343,12 @@
             font-weight: bold;
             font-size: 11px;
             border-right: 3px solid #667eea;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .time-header-cell:hover {
+            background: #0079FF;
         }
 
         .header-cell:hover {
@@ -589,6 +595,54 @@
         .subcapability-description {
             color: #2c3e50;
             line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        /* Special styling for TIME modal content */
+        .time-modal-content {
+            padding: 0;
+        }
+
+        .time-status-section {
+            margin-bottom: 25px;
+        }
+
+        .time-status-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .time-status-item.invest {
+            border-left-color: #28a745;
+        }
+
+        .time-status-item.tolerate {
+            border-left-color: #ffc107;
+        }
+
+        .time-status-item.migrate {
+            border-left-color: #fd7e14;
+        }
+
+        .time-status-item.eliminate {
+            border-left-color: #dc3545;
+        }
+
+        .time-status-label {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #001c66;
+        }
+
+        .time-status-description {
+            color: #495057;
+            line-height: 1.6;
             font-size: 0.95em;
         }
 
@@ -972,10 +1026,11 @@
             cornerCell.style.paddingRight = '25px';
             heatmap.appendChild(cornerCell);
 
-            // TIME Status header
+            // TIME Status header - NOW WITH CLICK EVENT
             const timeHeaderCell = document.createElement('div');
             timeHeaderCell.className = 'time-header-cell';
             timeHeaderCell.innerHTML = '<div><strong>TIME</strong><br>Status</div>';
+            timeHeaderCell.addEventListener('click', showTimeStatusModal); // Add click event for static modal
             heatmap.appendChild(timeHeaderCell);
 
             // Capability headers - ALWAYS RENDERED
@@ -1087,6 +1142,72 @@
             updateStats(filteredTools);
         }
 
+        // NEW FUNCTION: Show static TIME Status modal
+        function showTimeStatusModal() {
+            const modal = document.getElementById('capabilityModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = 'Gartner TIME Methodology';
+            modalContent.innerHTML = '';
+            modalContent.className = 'time-modal-content';
+            
+            // STATIC CONTENT FOR TIME STATUS MODAL
+            // Replace this content with your actual TIME methodology text
+            const timeContent = `
+                <div class="time-status-section">
+                    <div class="time-status-item invest">
+                        <div>
+                            <div class="time-status-label">INVEST</div>
+                            <div class="time-status-description">
+                                Applications with both high technical and functional fit. These are mission-critical systems that deliver substantial business value and warrant continued enhancement and resource allocation to support strategic objectives. Investment should focus on expanding capabilities, improving performance, and ensuring scalability.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="time-status-item tolerate">
+                        <div>
+                            <div class="time-status-label">TOLERATE</div>
+                            <div class="time-status-description">
+                                Applications with high technical fit but low functional value. These systems work adequately but don't significantly contribute to business goals. Maintain them in their current state without additional investment until a compelling business case emerges for change. Minimize costs while ensuring operational stability.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="time-status-item migrate">
+                        <div>
+                            <div class="time-status-label">MIGRATE</div>
+                            <div class="time-status-description">
+                                Applications with low technical fit but high functional value. While important for business operations, these systems suffer from technical debt, obsolete architecture, or compatibility issues. Plan to re-architect or replace them with modern alternatives that better align with current technology standards.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="time-status-item eliminate">
+                        <div>
+                            <div class="time-status-label">ELIMINATE</div>
+                            <div class="time-status-description">
+                                Applications with both low technical and functional fit. These redundant, obsolete, or underperforming systems should be decommissioned to reduce costs and complexity. Develop a sunset plan to migrate users and data to alternative solutions before retirement.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 25px; padding: 15px; background: #f0f7ff; border-radius: 8px; border: 1px solid #0079FF;">
+                    <p style="color: #001c66; font-size: 0.95em; line-height: 1.6; margin: 0;">
+                        <strong>About the TIME Methodology:</strong> The Gartner TIME framework is a strategic approach for Application Portfolio Management that helps organizations maximize business value by evaluating applications based on their technical condition and functional alignment with business objectives.
+                    </p>
+                </div>
+            `;
+            
+            modalContent.innerHTML = timeContent;
+            
+            // Scroll modal content to top when opening
+            modalContent.scrollTop = 0;
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
         function updateStats(filteredTools) {
             document.getElementById('tools-count').textContent = filteredTools.length;
             document.getElementById('capabilities-count').textContent = capabilities.length;
@@ -1184,6 +1305,7 @@
             
             modalTitle.textContent = `${capabilityIndex}. ${capabilityName}`;
             modalContent.innerHTML = '';
+            modalContent.className = 'subcapability-list'; // Reset to default class
             
             const subcapabilities = subcapabilitiesData[capabilityIndex] || [];
             
@@ -1230,6 +1352,7 @@
             
             modalTitle.textContent = toolData.Tool;
             modalContent.innerHTML = '';
+            modalContent.className = 'subcapability-list'; // Reset to default class
             
             const timeStatus = toolData['TIME Status'] || 'Not Set';
             let timeStatusColor = '#6c757d';
