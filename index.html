@@ -135,6 +135,21 @@
             color: white;
         }
 
+        .region-checkbox.usage-not-detected {
+            border-color: #ff6b6b;
+        }
+
+        .region-checkbox.usage-not-detected:hover {
+            border-color: #ff5252;
+            background: #fff5f5;
+        }
+
+        .region-checkbox.usage-not-detected.selected {
+            border-color: #ff5252;
+            background: #ff5252;
+            color: white;
+        }
+
         .filter-actions {
             display: flex;
             gap: 10px;
@@ -749,6 +764,10 @@
                     <input type="checkbox" id="gac" value="GAC" checked>
                     <span>GAC</span>
                 </label>
+                <label class="region-checkbox usage-not-detected" id="usage-not-detected-label">
+                    <input type="checkbox" id="usage-not-detected" value="USAGE_NOT_DETECTED">
+                    <span>Usage not detected</span>
+                </label>
                 <div class="filter-actions">
                     <button class="filter-btn" id="select-all">Select All</button>
                     <button class="filter-btn" id="clear-all">Clear All</button>
@@ -842,6 +861,7 @@
         let capabilities = [];
         let selectedRegions = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
         let regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
+        let showUnusedTools = false;
 
         // Load data from GitHub on page load
         async function loadDataFromGitHub() {
@@ -1043,10 +1063,39 @@
                 heatmap.appendChild(headerCell);
             });
 
-            // Filter tools by selected regions
-            const filteredTools = toolsData.filter(row => 
-                selectedRegions.some(region => row[region] === 1)
-            ).sort((a, b) => a.Tool.localeCompare(b.Tool));
+            // Filter tools based on selection
+            let filteredTools = [];
+            
+            // Check if "Usage not detected" is selected
+            if (showUnusedTools) {
+                // Get tools with no usage in any region
+                const unusedTools = toolsData.filter(row => {
+                    return regionColumns.every(region => !row[region] || row[region] === 0);
+                });
+                filteredTools = filteredTools.concat(unusedTools);
+            }
+            
+            // Check for regular region selections
+            if (selectedRegions.length > 0) {
+                const regionalTools = toolsData.filter(row => 
+                    selectedRegions.some(region => row[region] === 1)
+                );
+                
+                // Combine with unused tools if both are selected
+                if (showUnusedTools) {
+                    // Avoid duplicates by filtering
+                    regionalTools.forEach(tool => {
+                        if (!filteredTools.some(t => t.Tool === tool.Tool)) {
+                            filteredTools.push(tool);
+                        }
+                    });
+                } else {
+                    filteredTools = regionalTools;
+                }
+            }
+            
+            // Sort tools alphabetically
+            filteredTools.sort((a, b) => a.Tool.localeCompare(b.Tool));
 
             if (filteredTools.length === 0) {
                 // No tools selected, but headers are still shown
@@ -1241,12 +1290,14 @@
 
             document.getElementById('select-all').addEventListener('click', () => {
                 selectedRegions = [...regionColumns];
+                showUnusedTools = true;
                 updateRegionCheckboxes();
                 updateHeatmap();
             });
 
             document.getElementById('clear-all').addEventListener('click', () => {
                 selectedRegions = [];
+                showUnusedTools = false;
                 updateRegionCheckboxes();
                 updateHeatmap();
             });
@@ -1277,9 +1328,18 @@
 
         function handleRegionChange() {
             const checkboxes = document.querySelectorAll('.region-checkbox input[type="checkbox"]');
-            selectedRegions = Array.from(checkboxes)
-                .filter(cb => cb.checked)
-                .map(cb => cb.value);
+            selectedRegions = [];
+            showUnusedTools = false;
+            
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    if (cb.value === 'USAGE_NOT_DETECTED') {
+                        showUnusedTools = true;
+                    } else {
+                        selectedRegions.push(cb.value);
+                    }
+                }
+            });
 
             updateRegionCheckboxes();
             updateHeatmap();
@@ -1288,12 +1348,23 @@
         function updateRegionCheckboxes() {
             document.querySelectorAll('.region-checkbox').forEach(label => {
                 const checkbox = label.querySelector('input');
-                if (selectedRegions.includes(checkbox.value)) {
-                    label.classList.add('selected');
-                    checkbox.checked = true;
+                
+                if (checkbox.value === 'USAGE_NOT_DETECTED') {
+                    if (showUnusedTools) {
+                        label.classList.add('selected');
+                        checkbox.checked = true;
+                    } else {
+                        label.classList.remove('selected');
+                        checkbox.checked = false;
+                    }
                 } else {
-                    label.classList.remove('selected');
-                    checkbox.checked = false;
+                    if (selectedRegions.includes(checkbox.value)) {
+                        label.classList.add('selected');
+                        checkbox.checked = true;
+                    } else {
+                        label.classList.remove('selected');
+                        checkbox.checked = false;
+                    }
                 }
             });
         }
