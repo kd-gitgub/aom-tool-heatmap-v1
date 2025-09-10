@@ -135,20 +135,8 @@
             color: white;
         }
 
-        .region-checkbox.usage-not-detected {
-            border-color: #ff6b6b;
-        }
-
-        .region-checkbox.usage-not-detected:hover {
-            border-color: #ff5252;
-            background: #fff5f5;
-        }
-
-        .region-checkbox.usage-not-detected.selected {
-            border-color: #ff5252;
-            background: #ff5252;
-            color: white;
-        }
+        /* Removed special styling for usage-not-detected class */
+        /* Now it uses the same styling as other checkboxes */
 
         .filter-actions {
             display: flex;
@@ -764,9 +752,9 @@
                     <input type="checkbox" id="gac" value="GAC" checked>
                     <span>GAC</span>
                 </label>
-                <label class="region-checkbox usage-not-detected" id="usage-not-detected-label">
+                <label class="region-checkbox" id="usage-not-detected-label">
                     <input type="checkbox" id="usage-not-detected" value="USAGE_NOT_DETECTED">
-                    <span>Usage not detected</span>
+                    <span>Not detected</span>
                 </label>
                 <div class="filter-actions">
                     <button class="filter-btn" id="select-all">Select All</button>
@@ -1066,7 +1054,7 @@
             // Filter tools based on selection
             let filteredTools = [];
             
-            // Check if "Usage not detected" is selected
+            // Check if "Not detected" is selected
             if (showUnusedTools) {
                 // Get tools with no usage in any region
                 const unusedTools = toolsData.filter(row => {
