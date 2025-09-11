@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Tool Consolidation Heatmap - Version D</title>
+    <title>Analytics Tool Inventory Heatmap - Version D</title>
     <style>
         * {
             margin: 0;
@@ -431,6 +431,11 @@
             color: #2c3e50;
         }
 
+        .time-status-tbd {
+            background: #9e9e9e;
+            color: white;
+        }
+
         .capability-cell {
             padding: 6px;
             border: 1px solid #e1e8ed;
@@ -720,8 +725,8 @@
 
     <div class="container">
         <div class="header">
-            <h1>Analytics Tools: Rationalisation Potential</h1>
-            <p>Scenario #1: Databricks as a default foundational tool across all D&A teams</p>
+            <h1>Analytics Tool Inventory</h1>
+            <p>Tool discovery is still in progress</p>
         </div>
 
         <div class="error-message" id="error-message"></div>
@@ -1137,6 +1142,10 @@
                         timeStatusCell.classList.add('time-status-eliminate');
                         timeStatusCell.textContent = 'Eliminate';
                         break;
+                    case 'tbd':
+                        timeStatusCell.classList.add('time-status-tbd');
+                        timeStatusCell.textContent = 'TBD';
+                        break;
                     default:
                         timeStatusCell.style.background = 'linear-gradient(135deg, #f8f9fa, #e9ecef)';
                         timeStatusCell.style.color = '#6c757d';
@@ -1434,6 +1443,10 @@
                     timeStatusColor = 'white';
                     timeStatusBg = '#dc3545';
                     break;
+                case 'tbd':
+                    timeStatusColor = 'white';
+                    timeStatusBg = '#9e9e9e';
+                    break;
             }
             
             const descriptionDiv = document.createElement('div');
@@ -1446,7 +1459,7 @@
                     <div style="margin-bottom: 10px;">
                         <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">TIME Status:</strong>
                         <div style="margin-top: 4px; padding: 8px 12px; background: ${timeStatusBg}; color: ${timeStatusColor}; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em; font-weight: 600; display: inline-block;">
-                            ${timeStatus}
+                            ${timeStatus === 'tbd' ? 'TBD' : timeStatus}
                         </div>
                     </div>
                     <div style="margin-bottom: 10px;">
