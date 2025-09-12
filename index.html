@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Tool Inventory Heatmap - Version D</title>
+    <title>Analytics Tool Inventory Heatmap</title>
     <style>
         * {
             margin: 0;
@@ -91,10 +91,12 @@
             border: 2px solid #dadce0;
         }
 
-        .region-filter h3 {
-            color: #0A142D;
-            margin-bottom: 10px;
-            font-size: 1.1em;
+        .confidence-filter {
+            background: linear-gradient(135deg, #f1f3f4, #e8eaed);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #dadce0;
         }
 
         .filter-controls {
@@ -104,7 +106,7 @@
             align-items: center;
         }
 
-        .region-checkbox {
+        .region-checkbox, .confidence-checkbox {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -117,19 +119,19 @@
             font-weight: 500;
         }
 
-        .region-checkbox:hover {
+        .region-checkbox:hover, .confidence-checkbox:hover {
             border-color: #0079FF;
             background: #f0f7ff;
         }
 
-        .region-checkbox input[type="checkbox"] {
+        .region-checkbox input[type="checkbox"], .confidence-checkbox input[type="checkbox"] {
             width: 16px;
             height: 16px;
             accent-color: #0079FF;
             cursor: pointer;
         }
 
-        .region-checkbox.selected {
+        .region-checkbox.selected, .confidence-checkbox.selected {
             border-color: #0079FF;
             background: #0079FF;
             color: white;
@@ -156,6 +158,73 @@
             color: white;
         }
 
+        .contrast-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 2px solid #dadce0;
+        }
+
+        .contrast-slider-label {
+            color: #0A142D;
+            font-weight: 600;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slider-side-label {
+            color: #495057;
+            font-size: 0.85em;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .contrast-slider {
+            width: 230px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #001C66;
+            outline: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .contrast-slider:hover {
+            opacity: 1;
+        }
+
+        .contrast-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0079FF;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .contrast-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0079FF;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
         .header {
             text-align: center;
             margin-bottom: 15px;
@@ -176,7 +245,7 @@
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 15px;
             margin: 15px 0;
         }
@@ -203,7 +272,7 @@
         .legend {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 25px;
             margin: 10px 0;
             padding: 15px;
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
@@ -235,6 +304,15 @@
         .primary { background: #8f29fc; }
         .secondary { background: #c77cd8; }
         .tertiary { background: #d3cad9; }
+        .pending { 
+            background: repeating-linear-gradient(
+                45deg,
+                #ffd700,
+                #ffd700 4px,
+                #ffed8a 4px,
+                #ffed8a 8px
+            );
+        }
         .none { background: linear-gradient(135deg, #f8f9fa, #e9ecef); }
 
         .heatmap-container {
@@ -383,10 +461,6 @@
             background: linear-gradient(135deg, #e9ecef, #dee2e6);
         }
 
-        .databricks-highlight {
-            /* No special styling - uses default tool-cell styling */
-        }
-
         .time-status-cell {
             padding: 6px;
             text-align: center;
@@ -427,7 +501,7 @@
         }
 
         .time-status-tbd {
-            background: #D7DDE8 !important;
+            background: #F7D5C6 !important;
             color: #001C66;
         }
 
@@ -469,12 +543,25 @@
 
         .tertiary-cell {
             background: #d3cad9;
+            color: #001C66;
+        }
+
+        .pending-cell {
+            background: repeating-linear-gradient(
+                45deg,
+                #ffd700,
+                #ffd700 4px,
+                #ffed8a 4px,
+                #ffed8a 8px
+            );
             color: #2c3e50;
+            font-weight: bold;
+            font-style: italic;
         }
 
         .none-cell {
             background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            color: #6c757d;
+            color: #001C66;
         }
 
         .scroll-hint {
@@ -703,6 +790,10 @@
                 margin-right: 0;
                 margin-bottom: 8px;
             }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -770,8 +861,12 @@
                 <div class="stat-label">Level 2 Capabilities</div>
             </div>
             <div class="stat-card">
+                <div class="stat-number" id="pending-count">0</div>
+                <div class="stat-label">Pending Evaluations</div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-number" id="high-potential-count">0</div>
-                <div class="stat-label">Tools with High Rationalisation Potential</div>
+                <div class="stat-label">High Rationalisation Potential</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number" id="reduction-potential">0%</div>
@@ -779,22 +874,56 @@
             </div>
         </div>
 
+        <div class="confidence-filter">
+            <div class="filter-controls">
+                <label class="confidence-checkbox selected" id="conf-high-label">
+                    <input type="checkbox" id="conf-high" value="H" checked>
+                    <span>High Confidence</span>
+                </label>
+                <label class="confidence-checkbox selected" id="conf-medium-label">
+                    <input type="checkbox" id="conf-medium" value="M" checked>
+                    <span>Medium Confidence</span>
+                </label>
+                <label class="confidence-checkbox selected" id="conf-low-label">
+                    <input type="checkbox" id="conf-low" value="L" checked>
+                    <span>Weak or no data</span>
+                </label>
+                <div class="filter-actions">
+                    <button class="filter-btn" id="conf-select-all">Select All</button>
+                    <button class="filter-btn" id="conf-clear-all">Clear All</button>
+                </div>
+                
+                <div class="contrast-slider-container">
+                    <label class="contrast-slider-label">Contrast:</label>
+                    <div class="slider-wrapper">
+                        <span class="slider-side-label">High</span>
+                        <input type="range" min="0" max="4" value="4" class="contrast-slider" id="contrastSlider">
+                        <span class="slider-side-label">Low</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color primary"></div>
-                <span>Primary - Core Purpose</span>
+                <span>P - Primary: Core purpose/strength</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color secondary"></div>
-                <span>Secondary - Strong Support</span>
+                <span>S - Secondary: Strong support</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color tertiary"></div>
-                <span>Tertiary - Basic Capability</span>
+                <span>T - Tertiary: Basic capability</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color none"></div>
-                <span>None - No Capability</span>
+                <span>N - None: No capability</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color pending"></div>
+                <span>? - Pending: Not yet evaluated</span>
             </div>
         </div>
 
@@ -811,7 +940,6 @@
 
     <button class="refresh-btn" id="refresh-btn" title="Refresh data from GitHub">↻</button>
 
-    <!-- Modal -->
     <div class="modal-overlay" id="capabilityModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -828,27 +956,20 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
-        // ============================================
-        // CONFIGURATION - YOUR GITHUB CSV URLS
-        // ============================================
         const GITHUB_CSV_URLS = {
             tools: 'https://raw.githubusercontent.com/kd-gitgub/aom-tool-heatmap-v1/main/tools-data.csv',
             subcapabilities: 'https://raw.githubusercontent.com/kd-gitgub/aom-tool-heatmap-v1/main/subcapabilities-data.csv'
         };
 
-        // ============================================
-        // END CONFIGURATION
-        // ============================================
-
-        // Global variables for storing data
         let toolsData = null;
         let subcapabilitiesData = {};
         let capabilities = [];
         let selectedRegions = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
         let regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
         let showUnusedTools = false;
+        let selectedConfidenceLevels = ['H', 'M', 'L'];
+        let contrastLevel = 4;
 
-        // Load data from GitHub on page load
         async function loadDataFromGitHub() {
             const loading = document.getElementById('loading');
             const errorDiv = document.getElementById('error-message');
@@ -857,7 +978,6 @@
             errorDiv.classList.remove('show');
 
             try {
-                // Fetch both CSV files from GitHub
                 const [toolsResponse, subcapResponse] = await Promise.all([
                     fetch(GITHUB_CSV_URLS.tools),
                     fetch(GITHUB_CSV_URLS.subcapabilities)
@@ -870,11 +990,9 @@
                 const toolsContent = await toolsResponse.text();
                 const subcapContent = await subcapResponse.text();
 
-                // Process the data
                 processToolsData(toolsContent);
                 processSubcapabilitiesData(subcapContent);
                 
-                // Initialize the heatmap
                 initializeHeatmap();
                 
                 loading.style.display = 'none';
@@ -890,7 +1008,6 @@
                 `;
                 errorDiv.classList.add('show');
                 
-                // Show empty heatmap
                 updateHeatmap();
             }
         }
@@ -899,15 +1016,13 @@
             const parsed = Papa.parse(csvContent, {
                 header: true,
                 skipEmptyLines: true,
-                dynamicTyping: true
+                dynamicTyping: false  // Keep as strings to preserve -1 format
             });
 
-            // Extract tools and capability names
             const allRows = parsed.data;
             const capabilityNamesRow = allRows.find(row => row.Tool === "CAPABILITY_NAMES");
             const toolRows = allRows.filter(row => row.Tool !== "CAPABILITY_NAMES");
 
-            // Sort capability columns numerically
             const capColumns = Object.keys(parsed.data[0] || {})
                 .filter(col => col.startsWith('Cap'))
                 .sort((a, b) => {
@@ -916,11 +1031,9 @@
                     return numA - numB;
                 });
 
-            // Extract capabilities and region columns
             capabilities = capColumns.map(col => capabilityNamesRow[col] || `Capability ${col.replace('Cap', '')}`);
             regionColumns = ['AMERICAS D&A', 'AMETA D&A', 'DIGITAL D&A', 'EUROPE D&A', 'ERA', 'GAC'];
 
-            // Store the tools data
             toolsData = toolRows;
         }
 
@@ -928,16 +1041,13 @@
             const parsed = Papa.parse(csvContent, {
                 header: true,
                 skipEmptyLines: true,
-                dynamicTyping: true
+                dynamicTyping: false
             });
 
-            // Reset subcapabilities data
             subcapabilitiesData = {};
             
-            // Track counts per capability to auto-fix duplicate IDs
             const capabilityCounts = {};
 
-            // Process each row
             parsed.data.forEach(row => {
                 const capId = parseInt(
                     row.Capability_ID || 
@@ -997,31 +1107,89 @@
         }
 
         function initializeHeatmap() {
-            // Setup event listeners
             setupEventListeners();
-
-            // Initial render
             updateHeatmap();
+        }
+
+        function parseScoreAndConfidence(cellValue) {
+            const value = String(cellValue || '').trim();
+            
+            let score = 0;
+            let confidence = '';
+            
+            if (value === '' || value === '0' || value === 0) {
+                return { score: 0, confidence: '' };
+            }
+            
+            // FIXED: Check for -1 specifically (both string and numeric)
+            if (value === '-1' || value === -1 || parseInt(value) === -1) {
+                return { score: -1, confidence: 'P' };
+            }
+            
+            const pendingPatterns = [
+                'pending', 
+                '?',
+                'p?',
+                'tbd',
+                'n/a',
+                'unknown'
+            ];
+            
+            const lowerValue = value.toLowerCase();
+            const isPending = pendingPatterns.some(pattern => 
+                lowerValue === pattern || 
+                lowerValue.includes(pattern)
+            );
+            
+            if (isPending) {
+                return { score: -1, confidence: 'P' };
+            }
+            
+            if (value.length >= 2 && isNaN(value)) {
+                const match = value.match(/^(\d+)([HMLhml])?$/);
+                if (match) {
+                    score = parseInt(match[1]);
+                    confidence = match[2] ? match[2].toUpperCase() : 'M';
+                } else {
+                    return { score: 0, confidence: '' };
+                }
+            } else if (!isNaN(value)) {
+                score = parseInt(value);
+                // FIXED: Check for -1 again after parsing
+                if (score === -1) {
+                    return { score: -1, confidence: 'P' };
+                }
+                if (score >= 1 && score <= 3) {
+                    confidence = 'M';
+                } else {
+                    score = 0;
+                    confidence = '';
+                }
+            } else {
+                return { score: 0, confidence: '' };
+            }
+            
+            if (confidence && !['H', 'M', 'L', 'P'].includes(confidence)) {
+                confidence = 'M';
+            }
+            
+            return { score, confidence };
         }
 
         function updateHeatmap() {
             const heatmap = document.getElementById('heatmap');
             heatmap.innerHTML = '';
 
-            // Check if data is loaded
             if (!toolsData || toolsData.length === 0 || capabilities.length === 0) {
                 heatmap.className = 'heatmap empty';
                 heatmap.innerHTML = '<div style="text-align: center; padding: 40px;">Loading data from GitHub...</div>';
                 return;
             }
 
-            // Always set up the grid structure
             heatmap.className = 'heatmap';
             heatmap.style.gridTemplateColumns = `320px 100px repeat(${capabilities.length}, minmax(100px, 1fr))`;
             heatmap.style.minWidth = `${320 + 100 + (capabilities.length * 100)}px`;
 
-            // Always render headers
-            // Corner cell
             const cornerCell = document.createElement('div');
             cornerCell.className = 'header-cell corner-cell';
             cornerCell.textContent = 'ANALYTICS TOOLS';
@@ -1031,14 +1199,12 @@
             cornerCell.style.paddingRight = '25px';
             heatmap.appendChild(cornerCell);
 
-            // TIME Status header - NOW WITH CLICK EVENT
             const timeHeaderCell = document.createElement('div');
             timeHeaderCell.className = 'time-header-cell';
             timeHeaderCell.innerHTML = '<div><strong>TIME</strong><br>Status</div>';
-            timeHeaderCell.addEventListener('click', showTimeStatusModal); // Add click event for static modal
+            timeHeaderCell.addEventListener('click', showTimeStatusModal);
             heatmap.appendChild(timeHeaderCell);
 
-            // Capability headers - ALWAYS RENDERED
             capabilities.forEach((capability, index) => {
                 const headerCell = document.createElement('div');
                 headerCell.className = 'header-cell capability-header';
@@ -1048,27 +1214,21 @@
                 heatmap.appendChild(headerCell);
             });
 
-            // Filter tools based on selection
             let filteredTools = [];
             
-            // Check if "Not detected" is selected
             if (showUnusedTools) {
-                // Get tools with no usage in any region
                 const unusedTools = toolsData.filter(row => {
-                    return regionColumns.every(region => !row[region] || row[region] === 0);
+                    return regionColumns.every(region => !row[region] || row[region] === 0 || row[region] === '0');
                 });
                 filteredTools = filteredTools.concat(unusedTools);
             }
             
-            // Check for regular region selections
             if (selectedRegions.length > 0) {
                 const regionalTools = toolsData.filter(row => 
-                    selectedRegions.some(region => row[region] === 1)
+                    selectedRegions.some(region => row[region] === 1 || row[region] === '1')
                 );
                 
-                // Combine with unused tools if both are selected
                 if (showUnusedTools) {
-                    // Avoid duplicates by filtering
                     regionalTools.forEach(tool => {
                         if (!filteredTools.some(t => t.Tool === tool.Tool)) {
                             filteredTools.push(tool);
@@ -1079,20 +1239,18 @@
                 }
             }
             
-            // Sort tools alphabetically
             filteredTools.sort((a, b) => a.Tool.localeCompare(b.Tool));
 
             if (filteredTools.length === 0) {
-                // No tools selected, but headers are still shown
                 heatmap.classList.add('headers-only');
                 const noDataMsg = document.createElement('div');
                 noDataMsg.className = 'no-data-message';
                 noDataMsg.innerHTML = '<strong>No tools selected</strong><br>Select one or more regions above to view tools, or click on capability headers to explore subcapabilities.';
                 heatmap.appendChild(noDataMsg);
                 
-                // Update stats for no tools
                 document.getElementById('tools-count').textContent = '0';
                 document.getElementById('capabilities-count').textContent = capabilities.length;
+                document.getElementById('pending-count').textContent = '0';
                 document.getElementById('high-potential-count').textContent = '0';
                 document.getElementById('reduction-potential').textContent = '0%';
                 return;
@@ -1100,19 +1258,13 @@
 
             heatmap.classList.remove('headers-only');
 
-            // Tool rows
             filteredTools.forEach(toolRow => {
-                // Tool name cell
                 const toolCell = document.createElement('div');
                 toolCell.className = 'tool-cell';
-                if (toolRow.Tool.toLowerCase().includes('databricks')) {
-                    toolCell.classList.add('databricks-highlight');
-                }
                 toolCell.textContent = toolRow.Tool;
                 toolCell.addEventListener('click', () => showToolModal(toolRow));
                 heatmap.appendChild(toolCell);
 
-                // TIME Status cell
                 const timeStatusCell = document.createElement('div');
                 timeStatusCell.className = 'time-status-cell';
                 const timeStatus = toolRow['TIME Status'] || '';
@@ -1146,41 +1298,129 @@
                 
                 heatmap.appendChild(timeStatusCell);
 
-                // Capability cells
                 capabilities.forEach((capability, capIndex) => {
                     const capColumnName = `Cap${capIndex + 1}`;
-                    const score = parseInt(toolRow[capColumnName]) || 0;
+                    const cellValue = toolRow[capColumnName];
+                    
+                    const { score, confidence } = parseScoreAndConfidence(cellValue);
 
                     const cell = document.createElement('div');
                     cell.className = 'capability-cell';
+                    cell.dataset.confidence = confidence;
+                    cell.dataset.score = score;
 
                     switch(score) {
                         case 3:
                             cell.classList.add('primary-cell');
-                            cell.textContent = 'P';
+                            cell.textContent = 'Primary';
                             break;
                         case 2:
                             cell.classList.add('secondary-cell');
-                            cell.textContent = 'S';
+                            cell.textContent = 'Secondary';
                             break;
                         case 1:
                             cell.classList.add('tertiary-cell');
-                            cell.textContent = 'T';
+                            cell.textContent = 'Tertiary';
+                            break;
+                        case -1:
+                            cell.classList.add('pending-cell');
+                            cell.textContent = 'Pending';
                             break;
                         default:
                             cell.classList.add('none-cell');
-                            cell.textContent = '-';
+                            cell.textContent = 'None';
                     }
 
                     heatmap.appendChild(cell);
                 });
             });
 
-            // Update stats
+            applyAllFilters();
             updateStats(filteredTools);
         }
 
-        // NEW FUNCTION: Show static TIME Status modal
+        function applyAllFilters() {
+            applyConfidenceFilter();
+            applyContrastFilter();
+        }
+
+        function applyConfidenceFilter() {
+            const cells = document.querySelectorAll('.capability-cell');
+            
+            cells.forEach(cell => {
+                const confidence = cell.dataset.confidence;
+                const score = parseInt(cell.dataset.score);
+                
+                cell.style.opacity = '';
+                cell.style.visibility = '';
+                cell.dataset.confidenceHidden = 'false';
+                
+                if (score === 0) {
+                    if (!selectedConfidenceLevels.includes('L')) {
+                        cell.dataset.confidenceHidden = 'true';
+                    }
+                } else if (score === -1) {
+                    cell.dataset.confidenceHidden = 'false';
+                } else {
+                    if (!selectedConfidenceLevels.includes(confidence)) {
+                        cell.dataset.confidenceHidden = 'true';
+                    }
+                }
+            });
+        }
+
+        function applyContrastFilter() {
+            const cells = document.querySelectorAll('.capability-cell');
+            
+            cells.forEach(cell => {
+                const score = parseInt(cell.dataset.score);
+                const confidenceHidden = cell.dataset.confidenceHidden === 'true';
+                const originalText = getOriginalText(score);
+                
+                let contrastHidden = false;
+                switch(contrastLevel) {
+                    case 0:
+                        contrastHidden = score !== 3;
+                        break;
+                    case 1:
+                        contrastHidden = score < 2;
+                        break;
+                    case 2:
+                        contrastHidden = score < 1;
+                        break;
+                    case 3:
+                        contrastHidden = score === -1;
+                        break;
+                    case 4:
+                    default:
+                        contrastHidden = false;
+                        break;
+                }
+                
+                if (confidenceHidden || contrastHidden) {
+                    cell.style.opacity = '0.1';
+                    cell.textContent = '';
+                } else {
+                    cell.style.opacity = '';
+                    if (score === -1) {
+                        cell.textContent = 'Pending';
+                    } else {
+                        cell.textContent = originalText;
+                    }
+                }
+            });
+        }
+
+        function getOriginalText(score) {
+            switch(score) {
+                case 3: return 'Primary';
+                case 2: return 'Secondary';
+                case 1: return 'Tertiary';
+                case -1: return 'Pending';
+                default: return 'None';
+            }
+        }
+
         function showTimeStatusModal() {
             const modal = document.getElementById('capabilityModal');
             const modalTitle = document.getElementById('modalTitle');
@@ -1190,15 +1430,13 @@
             modalContent.innerHTML = '';
             modalContent.className = 'time-modal-content';
             
-            // STATIC CONTENT FOR TIME STATUS MODAL
-            // Replace this content with your actual TIME methodology text
             const timeContent = `
                 <div class="time-status-section">
                     <div class="time-status-item invest">
                         <div>
                             <div class="time-status-label">INVEST</div>
                             <div class="time-status-description">
-                                Applications with both high technical and functional fit. These are mission-critical systems that deliver substantial business value and warrant continued enhancement and resource allocation to support strategic objectives. Investment should focus on expanding capabilities, improving performance, and ensuring scalability.
+                                Applications with both high technical and functional fit. These are mission-critical systems that deliver substantial business value and warrant continued enhancement and resource allocation to support strategic objectives.
                             </div>
                         </div>
                     </div>
@@ -1207,7 +1445,7 @@
                         <div>
                             <div class="time-status-label">TOLERATE</div>
                             <div class="time-status-description">
-                                Applications with high technical fit but low functional value. These systems work adequately but don't significantly contribute to business goals. Maintain them in their current state without additional investment until a compelling business case emerges for change. Minimize costs while ensuring operational stability.
+                                Applications with high technical fit but low functional value. These systems work adequately but don't significantly contribute to business goals. Maintain them in their current state without additional investment.
                             </div>
                         </div>
                     </div>
@@ -1216,7 +1454,7 @@
                         <div>
                             <div class="time-status-label">MIGRATE</div>
                             <div class="time-status-description">
-                                Applications with low technical fit but high functional value. While important for business operations, these systems suffer from technical debt, obsolete architecture, or compatibility issues. Plan to re-architect or replace them with modern alternatives that better align with current technology standards.
+                                Applications with low technical fit but high functional value. While important for business operations, these systems suffer from technical debt or obsolete architecture.
                             </div>
                         </div>
                     </div>
@@ -1225,22 +1463,14 @@
                         <div>
                             <div class="time-status-label">ELIMINATE</div>
                             <div class="time-status-description">
-                                Applications with both low technical and functional fit. These redundant, obsolete, or underperforming systems should be decommissioned to reduce costs and complexity. Develop a sunset plan to migrate users and data to alternative solutions before retirement.
+                                Applications with both low technical and functional fit. These redundant or underperforming systems should be decommissioned to reduce costs and complexity.
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div style="margin-top: 25px; padding: 15px; background: #f0f7ff; border-radius: 8px; border: 1px solid #0079FF;">
-                    <p style="color: #001c66; font-size: 0.95em; line-height: 1.6; margin: 0;">
-                        <strong>About the TIME Methodology:</strong> The Gartner TIME framework is a strategic approach for Application Portfolio Management that helps organizations maximize business value by evaluating applications based on their technical condition and functional alignment with business objectives.
-                    </p>
-                </div>
             `;
             
             modalContent.innerHTML = timeContent;
-            
-            // Scroll modal content to top when opening
             modalContent.scrollTop = 0;
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -1250,10 +1480,21 @@
             document.getElementById('tools-count').textContent = filteredTools.length;
             document.getElementById('capabilities-count').textContent = capabilities.length;
             
+            let pendingCount = 0;
+            filteredTools.forEach(row => {
+                for (let i = 1; i <= capabilities.length; i++) {
+                    const cellValue = row[`Cap${i}`];
+                    const { score } = parseScoreAndConfidence(cellValue);
+                    if (score === -1) pendingCount++;
+                }
+            });
+            document.getElementById('pending-count').textContent = pendingCount;
+            
             const highPotentialCount = filteredTools.filter(row => {
                 let highScores = 0;
                 for (let i = 1; i <= capabilities.length; i++) {
-                    const score = parseInt(row[`Cap${i}`]) || 0;
+                    const cellValue = row[`Cap${i}`];
+                    const { score } = parseScoreAndConfidence(cellValue);
                     if (score >= 3) highScores++;
                 }
                 return highScores >= 3;
@@ -1272,7 +1513,6 @@
         }
 
         function setupEventListeners() {
-            // Region filter event listeners
             document.querySelectorAll('.region-checkbox input[type="checkbox"]').forEach(checkbox => {
                 checkbox.addEventListener('change', handleRegionChange);
             });
@@ -1291,12 +1531,32 @@
                 updateHeatmap();
             });
 
-            // Refresh button
+            document.querySelectorAll('.confidence-checkbox input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', handleConfidenceChange);
+            });
+
+            document.getElementById('conf-select-all').addEventListener('click', () => {
+                selectedConfidenceLevels = ['H', 'M', 'L'];
+                updateConfidenceCheckboxes();
+                applyAllFilters();
+            });
+
+            document.getElementById('conf-clear-all').addEventListener('click', () => {
+                selectedConfidenceLevels = [];
+                updateConfidenceCheckboxes();
+                applyAllFilters();
+            });
+
+            const contrastSlider = document.getElementById('contrastSlider');
+            contrastSlider.addEventListener('input', (e) => {
+                contrastLevel = parseInt(e.target.value);
+                applyContrastFilter();
+            });
+
             document.getElementById('refresh-btn').addEventListener('click', () => {
                 loadDataFromGitHub();
             });
 
-            // Modal event listeners
             document.getElementById('modalClose').addEventListener('click', closeModal);
             
             document.getElementById('capabilityModal').addEventListener('click', function(e) {
@@ -1334,6 +1594,20 @@
             updateHeatmap();
         }
 
+        function handleConfidenceChange() {
+            const checkboxes = document.querySelectorAll('.confidence-checkbox input[type="checkbox"]');
+            selectedConfidenceLevels = [];
+            
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selectedConfidenceLevels.push(cb.value);
+                }
+            });
+
+            updateConfidenceCheckboxes();
+            applyAllFilters();
+        }
+
         function updateRegionCheckboxes() {
             document.querySelectorAll('.region-checkbox').forEach(label => {
                 const checkbox = label.querySelector('input');
@@ -1358,6 +1632,20 @@
             });
         }
 
+        function updateConfidenceCheckboxes() {
+            document.querySelectorAll('.confidence-checkbox').forEach(label => {
+                const checkbox = label.querySelector('input');
+                
+                if (selectedConfidenceLevels.includes(checkbox.value)) {
+                    label.classList.add('selected');
+                    checkbox.checked = true;
+                } else {
+                    label.classList.remove('selected');
+                    checkbox.checked = false;
+                }
+            });
+        }
+
         function showCapabilityModal(capabilityIndex, capabilityName) {
             const modal = document.getElementById('capabilityModal');
             const modalTitle = document.getElementById('modalTitle');
@@ -1365,7 +1653,7 @@
             
             modalTitle.textContent = `${capabilityIndex}. ${capabilityName}`;
             modalContent.innerHTML = '';
-            modalContent.className = 'subcapability-list'; // Reset to default class
+            modalContent.className = 'subcapability-list';
             
             const subcapabilities = subcapabilitiesData[capabilityIndex] || [];
             
@@ -1399,7 +1687,6 @@
                 });
             }
             
-            // Scroll modal content to top when opening
             modalContent.scrollTop = 0;
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -1412,7 +1699,7 @@
             
             modalTitle.textContent = toolData.Tool;
             modalContent.innerHTML = '';
-            modalContent.className = 'subcapability-list'; // Reset to default class
+            modalContent.className = 'subcapability-list';
             
             const timeStatus = toolData['TIME Status'] || 'Not Set';
             let timeStatusColor = '#6c757d';
@@ -1444,26 +1731,26 @@
             const descriptionDiv = document.createElement('div');
             descriptionDiv.style.padding = '0';
             descriptionDiv.innerHTML = `
-                <div style="margin-bottom: 20px; line-height: 1.6; color: #2c3e50; font-size: 1em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                <div style="margin-bottom: 20px; line-height: 1.6; color: #2c3e50; font-size: 1em;">
                     ${toolData.Description || 'No description available'}
                 </div>
                 <div style="margin-bottom: 15px;">
                     <div style="margin-bottom: 10px;">
-                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">TIME Status:</strong>
-                        <div style="margin-top: 4px; padding: 8px 12px; background: ${timeStatusBg}; color: ${timeStatusColor}; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em; font-weight: 600; display: inline-block;">
+                        <strong style="color: #495057; font-size: 0.95em;">TIME Status:</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: ${timeStatusBg}; color: ${timeStatusColor}; border-radius: 4px; border: 1px solid #e9ecef; font-size: 1em; font-weight: 600; display: inline-block;">
                             ${timeStatus === 'tbd' ? 'TBD' : timeStatus}
                         </div>
                     </div>
                     <div style="margin-bottom: 10px;">
-                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Primary SysAdmin:</strong>
-                        <div style="margin-top: 4px; padding: 8px 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em;">
-                            ████████@████████.com
+                        <strong style="color: #495057; font-size: 0.95em;">Primary SysAdmin:</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef; font-size: 1em;">
+                            ${toolData['Primary SysAdmin'] || 'Not specified'}
                         </div>
                     </div>
                     <div style="margin-bottom: 10px;">
-                        <strong style="color: #495057; font-size: 0.95em; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Budget holder(s):</strong>
-                        <div style="margin-top: 4px; padding: 8px 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1em;">
-                            ████████@████████.com, ████████@████████.com
+                        <strong style="color: #495057; font-size: 0.95em;">Budget holder(s):</strong>
+                        <div style="margin-top: 4px; padding: 8px 12px; background: #f8f9fa; border-radius: 4px; border: 1px solid #e9ecef; font-size: 1em;">
+                            ${toolData['Budget Holder(s)'] || 'Not specified'}
                         </div>
                     </div>
                 </div>
@@ -1476,7 +1763,6 @@
                         text-decoration: none;
                         border-radius: 6px;
                         font-weight: 600;
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                         transition: all 0.3s ease;
                     " onmouseover="this.style.background='linear-gradient(135deg, #5a6fd8, #6a42a0)'" 
                        onmouseout="this.style.background='linear-gradient(135deg, #667eea, #764ba2)'">
@@ -1487,7 +1773,6 @@
             
             modalContent.appendChild(descriptionDiv);
             
-            // Scroll modal content to top when opening
             modalContent.scrollTop = 0;
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
@@ -1499,7 +1784,6 @@
             document.body.style.overflow = '';
         }
 
-        // Load data when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadDataFromGitHub();
         });
